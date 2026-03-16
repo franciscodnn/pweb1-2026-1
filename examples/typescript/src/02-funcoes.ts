@@ -48,3 +48,34 @@ function somar(op1: number, op2?: number, op3?: number): number {
 
 console.log( somar(1) );
 // console.log( somar(1, 3) ); // Erro!
+
+function buscarUsuario() { 
+  return { id: 1, nome: "João" };
+}
+
+type Usuario = ReturnType<typeof buscarUsuario>;
+type UsuarioEspecifico = Pick<Usuario, "id" | "nome">;
+
+const user: UsuarioEspecifico = {
+  id: 10,
+  nome: "Francisco"
+};
+
+
+interface FuncaoFormatadora {
+  (valor: string): string;
+  formato?: string | undefined | null;
+}
+
+const formatarMaiusculo: FuncaoFormatadora = (s: string) => s.toUpperCase();
+// formatarMaiusculo.formato = "MAIÚSCULO";
+
+const nomes: unknown[] = ["Alice", "Bob", "Charlie"];
+
+// TypeScript infere que 'nome' é string
+nomes.forEach(nome => {
+  if(typeof nome === 'string')
+    console.log(nome.toUpperCase());
+
+  // console.log( (nome as string).toUpperCase() );
+});
