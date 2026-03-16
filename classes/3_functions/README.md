@@ -121,11 +121,11 @@
 ## Funções como Construtores
 - Funções que podem ser usadas com `new` para criar objetos
   ```typescript
-  interface TipoContrutor {
-    new (nome: string): { nome: string };
+  interface TipoContrutor<T> {
+    new (nome: string): T;
   }
   
-  function criarInstancia<T>(Construtor: new (nome: string) => T, nome: string): T {
+  function criarInstancia<T>(Construtor: TipoConstrutor<T>, nome: string): T {
     return new Construtor(nome);
   }
 
