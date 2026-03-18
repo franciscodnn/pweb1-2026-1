@@ -512,6 +512,53 @@ contador.iniciarContagemArrow();
 // Após 1 segundo, mostrará: 2
 ```
 
+---
+Considere este trecho específico abaixo.
+```typescript
+iniciarContagem() {
+  setTimeout(function() {
+    this.incrementar(); // Erro!
+  }, 1000);
+}
+```
+
+O que acontece aqui:
+- `setTimeout(...)` é uma função do navegador/Node.js
+- Quando o callback é executado (após 1 segundo), quem chama essa função é o sistema (timer), não o objeto `contador`
+- Em JavaScript, o valor de `this` é definido por **como a função é chamada**, não onde ela é definida
+
+---
+Considere este trecho específico abaixo, com uso de **arrow functions**.
+```typescript
+iniciarContagem() {
+  setTimeout(function() {
+    this.incrementar(); // Erro!
+  }, 1000);
+}
+```
+
+**Por que arrow functions resolvem?**
+- Arrow functions NÃO têm seu próprio this. Elas herdam o this do escopo onde foram definidas.
+
+**Como o TypeScript "entende" a arrow function**
+```typescript
+// O que você escreve
+iniciarContagemArrow() {
+  setTimeout(() => {
+    this.incrementar();
+  }, 1000);
+}
+
+// É aproximadamente como se fosse (simplificando)
+iniciarContagemArrow() {
+  const _this = this; // Guarda referência do this atual
+  
+  setTimeout(function() {
+    _this.incrementar(); // Usa a referência guardada
+  }, 1000);
+}
+```
+
 ## Classes e Interfaces
 - Classes podem implementar interfaces
 - Sintaxe: `class NomeClasse implements Interface1, Interface2 { ... }`
