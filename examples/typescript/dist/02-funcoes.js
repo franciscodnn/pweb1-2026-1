@@ -30,5 +30,21 @@ function somar(op1, op2, op3) {
     return op1;
 }
 console.log(somar(1));
-console.log(somar(1, 3, 5));
+// console.log( somar(1, 3) ); // Erro!
+function buscarUsuario() {
+    return { id: 1, nome: "João" };
+}
+const user = {
+    id: 10,
+    nome: "Francisco"
+};
+const formatarMaiusculo = (s) => s.toUpperCase();
+// formatarMaiusculo.formato = "MAIÚSCULO";
+const nomes = ["Alice", "Bob", "Charlie"];
+// TypeScript infere que 'nome' é string
+nomes.forEach(nome => {
+    if (typeof nome === 'string')
+        console.log(nome.toUpperCase());
+    // console.log( (nome as string).toUpperCase() );
+});
 export {};
