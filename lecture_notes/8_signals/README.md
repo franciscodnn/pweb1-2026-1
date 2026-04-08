@@ -2,9 +2,9 @@
 
 # Aula 8 - Sinais (Signals) no Angular
 
-## 1. Introdução aos Sinais
+## 1. O que são Signals?
 
-Os Signals são uma nova API no Angular que fornece um sistema de reatividade granular. Eles permitem rastrear como e quando os dados mudam e atualizar apenas os componentes da UI que dependem desses dados específicos, resultando em aplicações mais eficientes e responsivas.
+Um **signal** é um wrapper em torno de um valor que **notifica automaticamente os consumidores quando esse valor muda**. O Angular usa essa notificação para atualizar apenas as partes da UI que dependem daquele dado — sem re-renderizar o componente inteiro.
 
 ### Principais características:
 
@@ -13,392 +13,474 @@ Os Signals são uma nova API no Angular que fornece um sistema de reatividade gr
 - **Granularidade**: Apenas as partes da UI que dependem de um sinal específico são atualizadas
 - **Eficiência**: Reduz a necessidade de verificações de detecção de mudanças em toda a aplicação
 
-## 2. Criando e Utilizando Sinais Básicos
-
-### Criando um Sinal
-
 ```typescript
-import { Component, signal } from '@angular/core';
+import { signal } from '@angular/core';
 
-@Component({
-  selector: 'app-contador',
-  standalone: true,
-  template: `
-    <h1>Contador: {{ contador() }}</h1>
-    <button (click)="incrementar()">Incrementar</button>
-    <button (click)="decrementar()">Decrementar</button>
-  `,
-})
-export class ContadorComponent {
-  contador = signal(0); // Cria um sinal com valor inicial 0
-  
-  incrementar() {
-    this.contador.update(valor => valor + 1);
-  }
-  
-  decrementar() {
-    this.contador.update(valor => valor - 1);
-  }
-}
+const preco = signal(99.90);
+
+// Signals são funções getter — chamá-los lê o valor atual
+console.log(preco()); // 99.90
 ```
 
-### Como acessar o valor de um Sinal
+> Chamar `preco()` faz **duas coisas**: retorna o valor atual e, se estiver em contexto reativo, registra a dependência.
 
-Para acessar o valor de um sinal, você chama o sinal como uma função:
+Signals podem ser **graváveis** (`WritableSignal`) ou **somente leitura** (`Signal`).
 
-```typescript
-// No template
-{{ contador() }}
+---
 
-// No código TypeScript
-console.log(this.contador()); // Mostra o valor atual
-```
-
-### Métodos para atualizar Sinais
+## 2. Sinais Graváveis (Writable Signals)
 
 ```typescript
-// Método set(): Substitui completamente o valor
-this.contador.set(10);
+import { signal } from '@angular/core';
 
-// Método update(): Atualiza o valor baseado no valor anterior
-this.contador.update(valor => valor * 2);
+const estoque = signal(10);
 
-// Método mutate(): Para objetos e arrays, permite modificar propriedades diretamente
-const usuarioSinal = signal({ nome: 'João', idade: 30 });
-usuarioSinal.mutate(usuario => {
-  usuario.idade = 31;
-});
+// set(): substitui o valor completamente
+estoque.set(20);
+
+// update(): calcula o novo valor a partir do anterior
+estoque.update(qtd => qtd - 1);
+
+console.log(estoque()); // 19
 ```
 
-## 3. Sinais Computados (Computed Signals)
-
-Os sinais computados dependem de outros sinais e são recalculados automaticamente quando os sinais dos quais dependem mudam.
+### Exemplo — Carrinho de Compras
 
 ```typescript
 import { Component, signal, computed } from '@angular/core';
-
-@Component({
-  selector: 'app-temperatura',
-  standalone: true,
-  template: `
-    <h2>Conversor de temperatura</h2>
-    <div>
-      <label>Celsius: </label>
-      <input type="number" [ngModel]="celsius()" (ngModelChange)="celsius.set($event)">
-    </div>
-    <div>
-      <label>Fahrenheit: </label>
-      <p>{{ fahrenheit() }}</p>
-    </div>
-  `,
-})
-export class TemperaturaComponent {
-  celsius = signal(0);
-  
-  // Sinal computado que depende do sinal celsius
-  fahrenheit = computed(() => (this.celsius() * 9/5) + 32);
-}
-```
-
-## 4. Efeitos (Effects)
-
-Effects permitem executar código quando sinais mudam, útil para operações colaterais como logging, chamadas de API, etc.
-
-```typescript
-import { Component, signal, effect } from '@angular/core';
 
 @Component({
   selector: 'app-carrinho',
   standalone: true,
   template: `
-    <h2>Carrinho de Compras</h2>
-    <button (click)="adicionarItem()">Adicionar Item</button>
-    <p>Total de itens: {{ totalItens() }}</p>
+    <h2>Carrinho</h2>
+    <p>Itens: {{ quantidade() }}</p>
+    <p>Total: R$ {{ total() }}</p>
+    <button (click)="adicionar()">+ Adicionar item (R$ 29,90)</button>
+    <button (click)="remover()" [disabled]="quantidade() === 0">- Remover</button>
   `,
 })
 export class CarrinhoComponent {
-  itens = signal<string[]>([]);
-  totalItens = computed(() => this.itens().length);
-  
-  constructor() {
-    // Efeito é executado inicialmente e depois sempre que totalItens mudar
-    effect(() => {
-      console.log(`O carrinho agora tem ${this.totalItens()} item(s)`);
-      
-      // Você poderia fazer uma chamada ao backend aqui
-      if (this.totalItens() > 0) {
-        this.salvarNoLocalStorage();
-      }
-    });
-  }
-  
-  adicionarItem() {
-    this.itens.update(itensAtuais => [...itensAtuais, `Item ${itensAtuais.length + 1}`]);
-  }
-  
-  salvarNoLocalStorage() {
-    localStorage.setItem('carrinho', JSON.stringify(this.itens()));
+  quantidade = signal(0);
+  precoUnitario = signal(29.90);
+
+  total = computed(() => this.quantidade() * this.precoUnitario());
+
+  adicionar() { this.quantidade.update(q => q + 1); }
+  remover()   { this.quantidade.update(q => q - 1); }
+}
+```
+
+### Obtendo um Signal somente leitura com `asReadonly()`
+
+Use `asReadonly()` para expor um signal público sem permitir modificações externas:
+
+```typescript
+import { Injectable, signal } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class PlacarService {
+  private readonly _pontos = signal(0);
+
+  // Componentes podem ler, mas não modificar diretamente
+  readonly pontos = this._pontos.asReadonly();
+
+  marcarPonto() {
+    this._pontos.update(p => p + 1);
   }
 }
 ```
 
-## 5. Integrando Sinais com Formulários
+---
+
+## 3. Sinais Computados (Computed Signals)
+
+São signals **somente leitura** que derivam seu valor de outros signals. Eles são:
+
+- **Lazy**: só calculam quando lidos pela primeira vez
+- **Memoizados**: reutilizam o cache se as dependências não mudaram
+- **Dinâmicos**: rastreiam apenas os signals realmente lidos durante a execução
+- **Somente leitura**: Não é possível usar `set()` ou `update()`.
 
 ```typescript
-import { Component, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, signal, computed, WritableSignal, Signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-formulario-usuario',
+  selector: 'app-nome-completo',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [FormsModule],
   template: `
-    <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
-      <div>
-        <label for="nome">Nome:</label>
-        <input id="nome" formControlName="nome">
-      </div>
-      <div>
-        <label for="email">Email:</label>
-        <input id="email" formControlName="email" type="email">
-      </div>
-      <button type="submit">Salvar</button>
-    </form>
-    
-    @if (usuarioSalvo()) {
-      <div>
-        <h3>Usuário Salvo:</h3>
-        <p>Nome: {{ usuarioSalvo()?.nome }}</p>
-        <p>Email: {{ usuarioSalvo()?.email }}</p>
-      </div>
-    }
+    <div>
+      <label>Nome: <input [(ngModel)]="nome" /></label>
+      <label>Sobrenome: <input [(ngModel)]="sobrenome" /></label>
+      <p>Nome completo: <strong>{{ nomeCompleto() }}</strong></p>
+    </div>
   `,
 })
-export class FormularioUsuarioComponent {
-  formulario = new FormGroup({
-    nome: new FormControl(''),
-    email: new FormControl(''),
-  });
-  
-  usuarioSalvo = signal<{nome: string, email: string} | null>(null);
-  
-  onSubmit() {
-    if (this.formulario.valid) {
-      // Atualizando o sinal com os valores do formulário
-      this.usuarioSalvo.set({
-        // ajustar this.formulario.value.nome => nome.value
-        // ajustar this.formulario.value.email => nome.email
-        nome: this.formulario.value.nome || '',
-        email: this.formulario.value.email || ''
-      });
-    }
-  }
+export class NomeCompletoComponent {
+  nome: WritableSignal<string> = signal('Ana');
+  sobrenome: WritableSignal<string> = signal('Silva');
+
+  nomeCompleto: Signal<string> = computed(() => `${this.nome()} ${this.sobrenome()}`);
 }
 ```
 
-## 6. Benefícios dos Sinais vs. Abordagens Anteriores
+### Dependências dinâmicas
 
-### Comparação com BehaviorSubject (RxJS)
+O `computed` rastreia **apenas** os signals lidos em cada execução:
 
-**Antes (com BehaviorSubject):**
 ```typescript
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
+const mostrarDetalhes = signal(false);
+const descricao = signal('Produto premium');
 
-@Component({
-  selector: 'app-contador-rxjs',
-  template: `
-    <h1>Contador: {{ contador }}</h1>
-    <button (click)="incrementar()">Incrementar</button>
-  `,
-})
-export class ContadorRxjsComponent implements OnInit, OnDestroy {
-  private contadorSubject = new BehaviorSubject<number>(0);
-  contador = 0;
-  private subscription: Subscription | null = null;
-  
-  ngOnInit() {
-    this.subscription = this.contadorSubject.subscribe(valor => {
-      this.contador = valor;
-    });
+const info = computed(() => {
+  if (mostrarDetalhes()) {
+    return `Detalhes: ${descricao()}`; // descricao() só é rastreado aqui
   }
-  
-  incrementar() {
-    this.contadorSubject.next(this.contadorSubject.value + 1);
-  }
-  
-  ngOnDestroy() {
-    this.subscription?.unsubscribe();
-  }
-}
+  return 'Clique para ver detalhes';
+});
 ```
 
-**Agora (com Signal):**
-```typescript
-import { Component, signal } from '@angular/core';
+Enquanto `mostrarDetalhes` for `false`, mudanças em `descricao` **não** reprocessam `info`.
 
-@Component({
-  selector: 'app-contador-signal',
-  template: `
-    <h1>Contador: {{ contador() }}</h1>
-    <button (click)="incrementar()">Incrementar</button>
-  `,
-})
-export class ContadorSignalComponent {
-  contador = signal(0);
-  
-  incrementar() {
-    this.contador.update(valor => valor + 1);
-  }
-}
-```
-
-### Vantagens:
-- **Código mais simples e legível**
-- **Sem necessidade de gerenciar subscrições**
-- **Sem problemas de memory leaks**
-- **Melhor desempenho devido à atualização granular**
-- **Integração nativa com o sistema de detecção de mudanças do Angular**
-
-## 7. Exemplo de Aplicação Completa com Sinais
-
-Vamos construir uma pequena lista de tarefas usando sinais:
+### Exemplo — Filtro de Lista
 
 ```typescript
 import { Component, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
-
-interface Tarefa {
-  id: number;
-  descricao: string;
-  concluida: boolean;
-}
 
 @Component({
-  selector: 'app-lista-tarefas',
+  selector: 'app-busca',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf],
+  imports: [FormsModule],
   template: `
-    <div class="container">
-      <h1>Lista de Tarefas</h1>
-      
-      <div class="form-group">
-        <input 
-          type="text" 
-          [(ngModel)]="novaTarefa" 
-          placeholder="Nova tarefa..." 
-          (keyup.enter)="adicionarTarefa()"
-        >
-        <button (click)="adicionarTarefa()">Adicionar</button>
-      </div>
-      
-      <div class="stats">
-        <p>Total: {{ totalTarefas() }}</p>
-        <p>Concluídas: {{ tarefasConcluidas() }}</p>
-        <p>Pendentes: {{ tarefasPendentes() }}</p>
-      </div>
-      
-      <ul class="tarefas">
-        @for (tarefa of tarefas(); track tarefa.id) {
-          <li>
-            <input 
-              type="checkbox" 
-              [checked]="tarefa.concluida" 
-              (change)="alternarStatus(tarefa.id)"
-            >
-            <span [class.concluida]="tarefa.concluida">
-              {{ tarefa.descricao }}
-            </span>
-            <button (click)="removerTarefa(tarefa.id)">X</button>
-          </li>
-        }
-      </ul>
-      
-      @if (totalTarefas() > 0) {
-        <div class="acoes">
-          <button (click)="limparTarefas()">Limpar todas</button>
-          <button (click)="limparConcluidas()">Remover concluídas</button>
-        </div>
+    <input [ngModel]="busca()" (ngModelChange)="busca.set($event)" placeholder="Buscar produto...">
+    <p>{{ resultados().length }} resultado(s)</p>
+    <ul>
+      @for (item of resultados(); track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+  `,
+})
+export class BuscaComponent {
+  busca = signal('');
+
+  produtos = signal(['Notebook', 'Mouse', 'Teclado', 'Monitor', 'Headset']);
+
+  resultados = computed(() =>
+    this.produtos().filter(p =>
+      p.toLowerCase().includes(this.busca().toLowerCase())
+    )
+  );
+}
+```
+
+---
+
+## 4. Estado Dependente com `linkedSignal`
+
+O `linkedSignal` cria um signal **gravável** vinculado a outro estado. Diferente do `computed` (somente leitura), você pode modificar seu valor diretamente — mas ele se **reseta automaticamente** quando a fonte muda.
+
+### O problema sem `linkedSignal`
+
+```typescript
+import { Component, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-abas-problema',
+  standalone: true,
+  template: `
+    <div>
+      @for (aba of abas(); track aba) {
+        <button (click)="selectedTab.set(aba)">{{ aba }}</button>
       }
     </div>
+    <p>Aba ativa: {{ selectedTab() }}</p>
+    <button (click)="trocarAbas()">Trocar conjunto de abas</button>
+    <p style="color: red">⚠ Após trocar as abas, selectedTab ainda mostra "{{ selectedTab() }}"
+      que pode não existir mais!</p>
   `,
-  styles: [`
-    .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-    .form-group { display: flex; margin-bottom: 20px; }
-    .form-group input { flex: 1; padding: 8px; margin-right: 10px; }
-    .tarefas { list-style: none; padding: 0; }
-    .tarefas li { display: flex; align-items: center; padding: 8px 0; }
-    .tarefas span { margin: 0 10px; flex: 1; }
-    .concluida { text-decoration: line-through; color: #888; }
-    .stats { display: flex; justify-content: space-between; }
-    .acoes { margin-top: 20px; display: flex; justify-content: space-between; }
-  `]
 })
-export class ListaTarefasComponent {
-  tarefas = signal<Tarefa[]>([]);
-  novaTarefa = '';
-  proximoId = signal(1);
-  
-  // Estatísticas computadas
-  totalTarefas = computed(() => this.tarefas().length);
-  tarefasConcluidas = computed(() => 
-    this.tarefas().filter(t => t.concluida).length
-  );
-  tarefasPendentes = computed(() => 
-    this.tarefas().filter(t => !t.concluida).length
-  );
-  
-  adicionarTarefa() {
-    if (this.novaTarefa.trim()) {
-      this.tarefas.update(tarefas => [
-        ...tarefas,
-        {
-          id: this.proximoId(),
-          descricao: this.novaTarefa,
-          concluida: false
-        }
-      ]);
-      
-      this.proximoId.update(id => id + 1);
-      this.novaTarefa = '';
-    }
-  }
-  
-  alternarStatus(id: number) {
-    this.tarefas.update(tarefas =>
-      tarefas.map(tarefa =>
-        tarefa.id === id
-          ? { ...tarefa, concluida: !tarefa.concluida }
-          : tarefa
-      )
-    );
-  }
-  
-  removerTarefa(id: number) {
-    this.tarefas.update(tarefas =>
-      tarefas.filter(tarefa => tarefa.id !== id)
-    );
-  }
-  
-  limparTarefas() {
-    this.tarefas.set([]);
-  }
-  
-  limparConcluidas() {
-    this.tarefas.update(tarefas =>
-      tarefas.filter(tarefa => !tarefa.concluida)
-    );
+export class AbasProblemaComponent {
+  abas = signal(['Início', 'Perfil', 'Config']);
+
+  // ❌ selectedTab pode ficar inválido se abas mudar!
+  selectedTab = signal(this.abas()[0]);
+
+  trocarAbas() {
+    this.abas.set(['Dashboard', 'Relatórios', 'Usuários']);
+    // selectedTab ainda vale 'Início', que não existe mais!
   }
 }
 ```
 
-## 8. Conclusão
+### Solução com `linkedSignal`
 
-Os Sinais no Angular fornecem uma maneira elegante e eficiente de gerenciar o estado da aplicação e a reatividade da UI. Eles oferecem:
+```typescript
+import { Component, signal, linkedSignal } from '@angular/core';
 
-- Código mais simples e direto
-- Melhor desempenho através da atualização granular
-- Melhor integração com o sistema de detecção de mudanças do Angular
+@Component({
+  selector: 'app-abas',
+  standalone: true,
+  template: `
+    <div>
+      @for (aba of abas(); track aba) {
+        <button (click)="selectedTab.set(aba)">{{ aba }}</button>
+      }
+    </div>
+    <p>Aba ativa: {{ selectedTab() }}</p>
+    <button (click)="trocarAbas()">Trocar conjunto de abas</button>
+  `,
+})
+export class AbasComponent {
+  abas = signal(['Início', 'Perfil', 'Config']);
 
-Ao dominar os Sinais, você pode criar aplicações Angular mais reativas, eficientes e fáceis de manter.
+  // Reseta para a primeira aba sempre que abas() mudar
+  selectedTab = linkedSignal(() => this.abas()[0]);
+
+  trocarAbas() {
+    this.abas.set(['Dashboard', 'Relatórios', 'Usuários']);
+    // selectedTab volta automaticamente para 'Dashboard'
+  }
+}
+```
+
+### Preservando a seleção anterior
+
+Use `source` + `computation` para manter a seleção quando ela ainda é válida:
+
+```typescript
+import { Component, signal, linkedSignal } from '@angular/core';
+
+interface Categoria {
+  id: number;
+  nome: string;
+}
+
+@Component({
+  selector: 'app-categorias',
+  standalone: true,
+  template: `
+    <h2>Categorias</h2>
+    <div>
+      @for (cat of categorias(); track cat.id) {
+        <button (click)="categoriaSelecionada.set(cat)">
+          {{ cat.nome }}
+        </button>
+      }
+    </div>
+    <p>Selecionada: <strong>{{ categoriaSelecionada().nome }}</strong></p>
+
+    <hr>
+    <button (click)="adicionarCategoria()">Adicionar Jogos</button>
+    <button (click)="removerEletronicos()">Remover Eletrônicos</button>
+  `,
+})
+export class CategoriasComponent {
+  categorias = signal<Categoria[]>([
+    { id: 1, nome: 'Eletrônicos' },
+    { id: 2, nome: 'Livros' },
+    { id: 3, nome: 'Roupas' },
+  ]);
+
+  // Mantém a categoria selecionada se ela ainda existir na nova lista;
+  // caso contrário, seleciona a primeira disponível
+  categoriaSelecionada = linkedSignal<Categoria[], Categoria>({
+    source: this.categorias,
+    computation: (novas, anterior) =>
+      novas.find(c => c.id === anterior?.value.id) ?? novas[0],
+  });
+
+  adicionarCategoria() {
+    this.categorias.update(cats => [...cats, { id: 4, nome: 'Jogos' }]);
+    // categoriaSelecionada permanece a mesma (ainda existe na lista)
+  }
+
+  removerEletronicos() {
+    this.categorias.update(cats => cats.filter(c => c.id !== 1));
+    // se Eletrônicos estava selecionado, categoriaSelecionada passa para Livros
+  }
+}
+```
+
+---
+
+## 5. Efeitos (Effects)
+
+Um `effect` é uma operação que roda sempre que um ou mais signals mudam. Ele é indicado para **sincronizar estado com APIs não-reativas** (DOM, localStorage, bibliotecas de terceiros, etc.).
+
+> **Regra de ouro**: sempre prefira `computed()` ou `linkedSignal()` antes de usar `effect()`.
+
+### Quando usar
+
+- ✅ Logging/Debugging de valores para analytics ou debugging
+- ✅ Salvar em `localStorage` ou `sessionStorage`
+- ✅ Integrar com bibliotecas externas (gráficos, mapas, etc.)
+
+### Quando **não** usar
+
+- ❌ Copiar valor de um signal para outro (use `computed`)
+- ❌ Derivar estado (use `computed` ou `linkedSignal`)
+
+### Exemplo — Persistência no localStorage
+
+```typescript
+import { Component, signal, effect } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-notas',
+  standalone: true,
+  imports: [FormsModule],
+  template: `
+    <h2>Bloco de Notas</h2>
+    <textarea [ngModel]="nota()" (ngModelChange)="nota.set($event)" rows="5" cols="40"></textarea>
+    <p><small>Salvo automaticamente</small></p>
+  `,
+})
+export class NotasComponent {
+  nota = signal(localStorage.getItem('nota') ?? '');
+
+  constructor() {
+    effect(() => {
+      // Executa sempre que nota() mudar
+      localStorage.setItem('nota', this.nota());
+    });
+  }
+}
+```
+
+### Effect no construtor (padrão)
+
+```typescript
+import { Component, signal, effect } from '@angular/core';
+
+@Component({ /* ... */ })
+export class LogComponent {
+  readonly pagina = signal('home');
+
+  constructor() {
+    effect(() => {
+      // Roda uma vez imediatamente e depois a cada mudança de pagina()
+      console.log(`Usuário navegou para: ${this.pagina()}`);
+    });
+  }
+}
+```
+
+### Effect com `onCleanup`
+
+Use `onCleanup` para cancelar operações pendentes antes da próxima execução:
+
+```typescript
+effect((onCleanup) => {
+  const termo = this.termoBusca();
+
+  const timer = setTimeout(() => {
+    console.log(`Buscando: ${termo}`);
+  }, 500); // debounce
+
+  onCleanup(() => clearTimeout(timer)); // cancela se o termo mudar antes de 500ms
+});
+```
+
+### Lendo sem rastrear com `untracked`
+
+```typescript
+import { effect, untracked } from '@angular/core';
+
+effect(() => {
+  const usuario = this.usuarioAtivo(); // rastreado — re-executa quando mudar
+
+  // versao NÃO rastreada — mudanças em contadorAcessos não re-executam o effect
+  const acessos = untracked(this.contadorAcessos);
+
+  console.log(`${usuario} acessou ${acessos} vezes`);
+});
+```
+
+## 6. Contexto Reativo
+
+Um **contexto reativo** é um ambiente onde o Angular monitora automaticamente quais signals são lidos para estabelecer dependências. Quando um signal rastreado muda, o Angular re-executa o consumidor.
+
+O Angular entra automaticamente em contexto reativo quando:
+
+| Contexto | Rastreado? |
+|---|---|
+| Template (`{{ sinal() }}`) | ✅ Sim |
+| `computed(() => ...)` | ✅ Sim |
+| `linkedSignal(() => ...)` | ✅ Sim |
+| `effect(() => ...)` | ✅ Sim |
+| `ngOnInit`, métodos comuns | ❌ Não |
+| Após `await` em effect | ❌ Não |
+
+### Onde existe contexto reativo
+
+```typescript
+// ✅ computed() — contexto reativo
+const nomeCompleto = computed(() => {
+  return `${nome()} ${sobrenome()}`; // nome e sobrenome são rastreados
+});
+
+// ✅ effect() — contexto reativo
+effect(() => {
+  console.log(this.pagina()); // pagina é rastreado, re-executa ao mudar
+});
+
+// ✅ Template — contexto reativo
+// {{ pagina() }} → Angular rastreia e atualiza a view automaticamente
+```
+
+### Onde NÃO existe contexto reativo
+
+```typescript
+// ❌ ngOnInit — não é contexto reativo
+ngOnInit() {
+  console.log(this.pagina()); // lê o valor, mas NÃO rastreia
+}
+
+// ❌ método comum — não é contexto reativo
+calcular() {
+  return this.preco() * 1.1; // lê, mas não re-executa quando preco mudar
+}
+```
+
+### Cuidado com operações assíncronas
+
+O contexto reativo é **síncrono** — signals lidos após um `await` **não são rastreados**:
+
+```typescript
+// ❌ tema() não será rastreado
+effect(async () => {
+  const dados = await buscarDados();
+  console.log(`Tema: ${this.tema()}`); // lido após await — sem rastreamento!
+});
+
+// ✅ ler o signal antes do await
+effect(async () => {
+  const temaAtual = this.tema(); // rastreado (lido antes do await)
+  const dados = await buscarDados();
+  console.log(`Tema: ${temaAtual}`);
+});
+```
+
+---
+
+## 7. Resumo: Qual API usar?
+
+| API | Gravável? | Quando usar |
+|---|---|---|
+| `signal()` | ✅ Sim | Estado independente |
+| `computed()` | ❌ Não | Valor derivado de outros signals |
+| `linkedSignal()` | ✅ Sim | Estado derivado que também pode ser modificado |
+| `effect()` | N/A | Sincronizar com APIs não-reativas (última opção) |
+
+---
+
+## Referências
+
+- [Angular Signals](https://next.angular.dev/guide/signals)
+- [linkedSignal](https://next.angular.dev/guide/signals/linked-signal)
+- [Effects](https://next.angular.dev/guide/signals/effect)
