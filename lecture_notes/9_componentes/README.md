@@ -2,763 +2,817 @@
 
 # Aula 9 - Componentes no Angular
 
-## 1. Introdução aos Componentes
+## 1. Anatomia de um Componente
 
-Os componentes são os blocos fundamentais de uma aplicação Angular. Cada componente é composto por:
-- Um **template HTML** que define a interface do usuário
-- Uma **classe TypeScript** que controla a lógica e dados
-- **Estilos CSS** específicos para o componente
-- Um **seletor** que define como o componente será usado em templates
+Os componentes são os blocos fundamentais de uma aplicação Angular. Cada componente Angular é composto por:
 
-### Estrutura básica de um componente:
+- Uma **classe TypeScript** com a lógica e os dados
+- Um **template HTML** que define a interface
+- Um **seletor CSS** que determina como o componente é usado em outros templates
+
+```typescript
+import { Component, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-perfil',
+  standalone: true,
+  template: `
+    <div class="p-4 bg-white rounded shadow">
+      <h2 class="text-xl font-bold text-gray-800">{{ nome() }}</h2>
+      <p class="text-gray-500">{{ cargo() }}</p>
+    </div>
+  `,
+})
+export class PerfilComponent {
+  nome  = signal('Ana Costa');
+  cargo = signal('Desenvolvedora Front-end');
+}
+```
+
+### Usando o componente em outro template
+
+Para usar um componente, importe-o no array `imports` do componente pai:
+
+```typescript
+import { Component } from '@angular/core';
+import { PerfilComponent } from './perfil.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [PerfilComponent],
+  template: `
+    <div class="min-h-screen bg-gray-100 p-8">
+      <app-perfil />
+    </div>
+  `,
+})
+export class AppComponent {}
+```
+
+### Template e estilos em arquivos separados
+
+```typescript
+@Component({
+  selector: 'app-perfil',
+  standalone: true,
+  templateUrl: './perfil.html',
+  styleUrl: './perfil.css',
+})
+export class PerfilComponent {}
+```
+
+> Os caminhos `templateUrl` e `styleUrl` são **relativos** ao diretório do componente.
+
+---
+
+## 2. Seletores
+
+O seletor define como o componente é instanciado em templates. O Angular suporta três tipos:
+
+### Seletor de elemento (mais comum)
+
+```typescript
+@Component({ selector: 'app-botao', ... })
+
+// Uso:
+<app-botao />
+```
+
+### Seletor de atributo
+
+Útil para estender elementos HTML nativos, aproveitando suas APIs (como atributos ARIA):
+
+```typescript
+@Component({ selector: 'button[app-primario]', ... })
+
+// Uso:
+<button app-primario>Enviar</button>
+```
+
+### Seletor de classe CSS
+
+```typescript
+@Component({ selector: '.app-destaque', ... })
+
+// Uso:
+<div class="app-destaque"></div>
+```
+
+### Boas práticas para seletores
+
+- Use sempre um **prefixo** curto e consistente (ex.: `app-`). O Angular reserva o prefixo `ng-`.
+- Seletores de **elemento** são recomendados na maioria dos casos.
+- Use seletores de **atributo** para componentes que "aprimoram" um elemento HTML nativo.
+- Todos os seletores são **case-sensitive**.
+
+---
+
+## 3. Estilização
+
+### Estilos inline no `@Component`
+
+Os estilos são **encapsulados** por padrão: só afetam o template do próprio componente.
+
+```typescript
+@Component({
+  selector: 'app-alerta',
+  standalone: true,
+  template: `
+    <div class="alerta">
+      <ng-content />
+    </div>
+  `,
+  styles: [`
+    .alerta {
+      border-left: 4px solid #f59e0b;
+      background: #fffbeb;
+      padding: 12px 16px;
+      border-radius: 4px;
+    }
+  `],
+})
+export class AlertaComponent {}
+```
+
+### Estilização com Tailwind (abordagem recomendada)
+
+Com Tailwind CSS, você estiliza diretamente no template e não precisa de estilos encapsulados:
 
 ```typescript
 import { Component } from '@angular/core';
 
 @Component({
-  // Metadados do componente
-  selector: 'app-meu-componente',
+  selector: 'app-badge',
   standalone: true,
   template: `
-    <h1>Olá, {{ nome }}</h1>
-    <button (click)="saudar()">Saudar</button>
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+      Ativo
+    </span>
   `,
-  styles: [`
-    h1 { color: blue; }
-    button { padding: 8px 16px; }
-  `]
 })
-export class MeuComponenteComponent {
-  nome = 'Mundo';
-  
-  saudar() {
-    alert('Olá, ' + this.nome + '!');
-  }
-}
+export class BadgeComponent {}
 ```
 
-## 2. Seletores de Componentes
+### Modos de encapsulamento (`ViewEncapsulation`)
 
-O seletor define como você pode usar o componente em um template HTML. Existem três tipos principais:
+| Modo | Comportamento |
+|---|---|
+| `Emulated` (padrão) | Estilos do componente não vazam; usa atributos HTML gerados |
+| `ShadowDom` | Usa Shadow DOM nativo do browser |
+| `None` | Sem encapsulamento — estilos tornam-se globais |
 
-### Seletor de elemento (mais comum)
+```typescript
+import { Component, ViewEncapsulation } from '@angular/core';
+
+@Component({
+  selector: 'app-exemplo',
+  standalone: true,
+  template: `<p class="titulo">Olá</p>`,
+  styles: [`.titulo { color: red; }`],
+  encapsulation: ViewEncapsulation.None, // estilos globais
+})
+export class ExemploComponent {}
+```
+
+### Seletor `:host`
+
+Use `:host` para estilizar o **elemento hospedeiro** do próprio componente:
 
 ```typescript
 @Component({
-  selector: 'app-item',
-  // ...
-})
-
-// Uso no template
-<app-item></app-item>
-```
-
-### Seletor de atributo
-
-```typescript
-@Component({
-  selector: '[appItem]',
-  // ...
-})
-
-// Uso no template
-<div appItem></div>
-```
-
-### Seletor de classe
-
-```typescript
-@Component({
-  selector: '.app-item',
-  // ...
-})
-
-// Uso no template
-<div class="app-item"></div>
-```
-
-## 3. Estilização de Componentes
-
-O Angular fornece encapsulamento de estilos, garantindo que os estilos definidos em um componente não afetem o restante da aplicação.
-
-### Formas de adicionar estilos
-
-#### 1. Inline no decorador @Component
-
-```typescript
-@Component({
-  // ...
-  styles: [`
-    h1 { color: red; }
-    p { font-size: 16px; }
-  `]
-})
-```
-
-#### 2. Arquivo externo
-
-```typescript
-@Component({
-  // ...
-  styleUrls: ['./meu-componente.component.css']
-})
-```
-
-### Variáveis CSS e estilos específicos
-
-```typescript
-@Component({
-  // ...
   styles: [`
     :host {
       display: block;
-      background-color: #f5f5f5;
-      padding: 20px;
+      padding: 16px;
     }
-    
     :host(.destaque) {
-      background-color: #ffffd0;
-      border: 1px solid gold;
+      border: 2px solid #3b82f6;
     }
-    
-    /* Variáveis CSS */
-    :host {
-      --cor-primaria: #1976d2;
-      --cor-secundaria: #455a64;
-    }
-    
-    h1 {
-      color: var(--cor-primaria);
-    }
-  `]
+  `],
 })
 ```
 
-## 4. Inputs - Passando Dados para Componentes
+---
 
-Os inputs permitem que dados sejam passados de um componente pai para um componente filho.
+## 4. Inputs — Recebendo Dados do Pai
 
-### Exemplo básico:
+Use a função `input()` para declarar propriedades que recebem valores do componente pai. O retorno é um **signal somente leitura** (`InputSignal`).
+
+### Exemplo básico
 
 ```typescript
-// Componente filho (cartao.component.ts)
-import { Component, Input } from '@angular/core';
+// app-cartao.component.ts
+import { Component, input, computed } from '@angular/core';
 
 @Component({
   selector: 'app-cartao',
   standalone: true,
   template: `
-    <div class="cartao">
-      <h2>{{ titulo }}</h2>
-      <p>{{ descricao }}</p>
+    <div class="border rounded-lg p-4 shadow-sm bg-white">
+      <h3 class="text-lg font-semibold text-gray-800">{{ titulo() }}</h3>
+      <p class="text-gray-500 mt-1">{{ descricao() }}</p>
+      <span class="text-xs font-medium text-blue-600 uppercase">{{ categoriaFormatada() }}</span>
     </div>
   `,
-  styles: [`
-    .cartao {
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 16px;
-      margin: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-  `]
 })
 export class CartaoComponent {
-  titulo: string = input('');
-  descricao: string = input('');
-}
+  titulo    = input.required<string>();  // obrigatório
+  descricao = input('Sem descrição');    // com valor padrão
+  categoria = input('geral');
 
-// Componente pai (app.component.ts)
+  categoriaFormatada = computed(() => this.categoria().toUpperCase());
+}
+```
+
+```typescript
+// app.component.ts
 import { Component } from '@angular/core';
-import { CartaoComponent } from './cartao.component';
+import { CartaoComponent } from './app-cartao.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CartaoComponent],
   template: `
-    <h1>Meus Cartões</h1>
-    <app-cartao 
-      titulo="Primeiro Cartão" 
-      descricao="Esta é a descrição do primeiro cartão">
-    </app-cartao>
-    
-    <app-cartao 
-      titulo="Segundo Cartão" 
-      descricao="Esta é a descrição do segundo cartão">
-    </app-cartao>
-  `
-})
-export class AppComponent {}
-```
-
-### Transformando inputs com setters:
-
-```typescript
-export class CartaoComponent {
-  private _categoria: string = input('');
-  
-  set categoria(valor: string) {
-    this._categoria = valor.toUpperCase();
-  }
-  
-  get categoria(): string {
-    return this._categoria;
-  }
-}
-```
-
-### Inputs com nomes diferentes:
-
-```typescript
-export class CartaoComponent {
-  titulo: string = input('', { alias: 'cardTitle' });
-  // Uso: <app-cartao cardTitle="Título"></app-cartao>
-}
-```
-
-### Inputs obrigatórios (Required):
-
-```typescript
-export class CartaoComponent {
-  titulo = input.required<string>();
-}
-```
-
-## 5. Outputs - Emitindo Eventos para Componentes Pai
-
-Os outputs permitem que eventos e dados sejam emitidos de um componente filho para um componente pai.
-
-### Exemplo básico:
-
-```typescript
-import { Component, Output, EventEmitter, signal } from '@angular/core';
-
-@Component({
-  selector: 'app-contador',
-  standalone: true,
-  template: `
-    <div>
-      <p>Contagem: {{ contador() }}</p>
-      <button (click)="incrementar()">Incrementar</button>
-      <button (click)="resetar()">Resetar</button>
-    </div>
-  `
-})
-export class ContadorComponent {
-  // Substituindo variável comum por signal
-  contador = signal(0);
-  
-  valorAlterado = output<number>();
-  foiResetado = output<void>();
-  
-  incrementar() {
-    // Atualizando o valor do signal
-    this.contador.update(valor => valor + 1);
-    this.valorAlterado.emit(this.contador());
-  }
-  
-  resetar() {
-    // Definindo o valor do signal
-    this.contador.set(0);
-    this.foiResetado.emit();
-    this.valorAlterado.emit(this.contador());
-  }
-}
-```
-
-## Componente pai (app.component.ts)
-
-```typescript
-import { Component, signal } from '@angular/core';
-import { ContadorComponent } from './contador.component';
-import { CommonModule } from '@angular/common';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [ContadorComponent, CommonModule],
-  template: `
-    <h1>Demo de Contador</h1>
-    <app-contador 
-      (valorAlterado)="onValorAlterado($event)"
-      (foiResetado)="onResetado()">
-    </app-contador>
-    
-    @if (mensagem()) {
-      <p>{{ mensagem() }}</p>
-    }
-  `
-})
-export class AppComponent {
-  // Substituindo variável comum por signal
-  mensagem = signal('');
-  
-  onValorAlterado(novoValor: number) {
-    this.mensagem.set(`O contador foi alterado para: ${novoValor}`);
-  }
-  
-  onResetado() {
-    this.mensagem.set('O contador foi resetado!');
-  }
-}
-```
-
-### Outputs com nomes diferentes:
-
-```typescript
-export class ContadorComponent {
-  valorAlterado = output<number>({ alias: 'counterChanged' });
-  // Uso: <app-contador (counterChanged)="onChanged($event)"></app-contador>
-}
-```
-
-## 6. Projeção de Conteúdo (Content Projection)
-
-A projeção de conteúdo permite que você insira conteúdo externo dentro do template de um componente.
-
-### Projeção simples:
-
-```typescript
-// Componente (card.component.ts)
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-card',
-  standalone: true,
-  template: `
-    <div class="card">
-      <ng-content></ng-content>
+    <div class="p-6 space-y-4">
+      <app-cartao titulo="Angular Signals" categoria="frontend" />
+      <app-cartao
+        titulo="TypeScript Avançado"
+        descricao="Genéricos, decorators e muito mais."
+        categoria="linguagem" />
     </div>
   `,
-  styles: [`
-    .card {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 16px;
-      margin: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-  `]
-})
-export class CardComponent {}
-
-// Uso no componente pai
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [CardComponent],
-  template: `
-    <app-card>
-      <h2>Título do Card</h2>
-      <p>Este é o conteúdo projetado dentro do card.</p>
-      <button>Clique aqui</button>
-    </app-card>
-  `
 })
 export class AppComponent {}
 ```
 
-### Projeção múltipla com seletores:
+### Input com `transform`
+
+Use `transform` para converter o valor recebido antes de usá-lo. O Angular oferece `booleanAttribute` e `numberAttribute` como helpers embutidos:
 
 ```typescript
-// Componente (dashboard-card.component.ts)
-import { Component } from '@angular/core';
+import { Component, input, booleanAttribute, numberAttribute } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard-card',
+  selector: 'app-progresso',
   standalone: true,
   template: `
-    <div class="card">
-      <div class="card-header">
-        <ng-content select="[card-title]"></ng-content>
-      </div>
-      <div class="card-body">
-        <ng-content select="[card-content]"></ng-content>
-      </div>
-      <div class="card-footer">
-        <ng-content select="[card-footer]"></ng-content>
+    <div class="w-full bg-gray-200 rounded-full h-3">
+      <div
+        class="h-3 rounded-full transition-all"
+        [class]="disabled() ? 'bg-gray-400' : 'bg-blue-600'"
+        [style.width.%]="valor()">
       </div>
     </div>
+    <p class="text-sm text-gray-600 mt-1">
+      {{ valor() }}%{{ disabled() ? ' (desativado)' : '' }}
+    </p>
   `,
-  styles: [`
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-bottom: 20px;
-    }
-    .card-header {
-      background-color: #f5f5f5;
-      padding: 10px 15px;
-      border-bottom: 1px solid #ddd;
-      font-weight: bold;
-    }
-    .card-body {
-      padding: 15px;
-    }
-    .card-footer {
-      padding: 10px 15px;
-      background-color: #f5f5f5;
-      border-top: 1px solid #ddd;
-    }
-  `]
 })
-export class DashboardCardComponent {}
-
-// Uso no componente pai
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [DashboardCardComponent],
-  template: `
-    <app-dashboard-card>
-      <div card-title>
-        <h3>Estatísticas</h3>
-      </div>
-      
-      <div card-content>
-        <p>Vendas totais: 10.456</p>
-        <p>Usuários ativos: 2.345</p>
-      </div>
-      
-      <div card-footer>
-        <button>Ver detalhes</button>
-      </div>
-    </app-dashboard-card>
-  `
-})
-export class AppComponent {}
+export class ProgressoComponent {
+  valor    = input(0,     { transform: numberAttribute });  // '75' → 75
+  disabled = input(false, { transform: booleanAttribute }); // '' → true
+}
 ```
-
-### Projeção condicional com ngProjectAs:
 
 ```html
-<app-dashboard-card>
-  <ng-container ngProjectAs="[card-title]">
-    @if (mostrarTitulo) {
-      <h3>Estatísticas</h3>
-    }
-  </ng-container>
-  
-  <!-- Resto do conteúdo -->
-</app-dashboard-card>
+<!-- no template pai -->
+<app-progresso valor="75" />
+<app-progresso valor="40" disabled />
 ```
 
-## 7. Exemplo Completo: Lista de Tarefas
-
-Vamos aplicar todos os conceitos em um exemplo prático:
+### Input com alias
 
 ```typescript
-// tarefa.interface.ts
-export interface Tarefa {
-  id: number;
-  titulo: string;
-  concluida: boolean;
+export class CartaoComponent {
+  // No TypeScript usa-se `titulo`, mas no template pai usa-se [cardTitle]
+  titulo = input('', { alias: 'cardTitle' });
 }
+```
 
-// tarefa-item.component.ts
-import { Component, input, output, EventEmitter } from '@angular/core';
-import { Tarefa } from './tarefa.interface';
+```html
+<app-cartao cardTitle="Meu Cartão" />
+```
+
+---
+
+## 5. Modelos — Two-way Binding com `model()`
+
+Um **model input** é um tipo especial de input que permite ao componente filho **propagar novos valores de volta ao pai**. É a abordagem moderna para implementar two-way binding (`[(propriedade)]`) em componentes customizados.
+
+Diferenças em relação ao `input()`:
+
+| | `input()` | `model()` |
+|---|---|---|
+| Direção | Pai → Filho | Pai ↔ Filho |
+| Gravável pelo filho | ❌ Não | ✅ Sim |
+| Gera output automático | ❌ Não | ✅ Sim (`xChange`) |
+| Sintaxe no pai | `[prop]` | `[(prop)]` |
+
+### Exemplo — campo de texto reutilizável
+
+```typescript
+// app-campo.component.ts
+import { Component, model } from '@angular/core';
 
 @Component({
-  selector: 'app-tarefa-item',
+  selector: 'app-campo',
   standalone: true,
   template: `
-    <div class="tarefa-item" [class.concluida]="tarefa.concluida">
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">{{ rotulo }}</label>
       <input
-        type="checkbox"
-        [checked]="tarefa.concluida"
-        (change)="marcarConcluida()"
-      />
-      <span class="titulo">{{ tarefa.titulo }}</span>
-      <button class="btn-remover" (click)="remover()">X</button>
+        [value]="valor()"
+        (input)="valor.set($any($event.target).value)"
+        class="border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
     </div>
   `,
-  styles: [`
-    .tarefa-item {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      margin: 5px 0;
-      background-color: #f9f9f9;
-      border-radius: 4px;
-    }
-    
-    .concluida .titulo {
-      text-decoration: line-through;
-      color: #888;
-    }
-    
-    .titulo {
-      flex: 1;
-      margin: 0 10px;
-    }
-    
-    .btn-remover {
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-    }
-  `]
 })
-export class TarefaItemComponent {
-  tarefa = input.required<Tarefa>();
-  tarefaConcluida = output<number>();
-  tarefaRemovida = output<number>();
-  
-  marcarConcluida() {
-    this.tarefaConcluida.emit(this.tarefa().id);
-  }
-  
-  remover() {
-    this.tarefaRemovida.emit(this.tarefa().id);
-  }
+export class CampoComponent {
+  rotulo = input('Campo');
+
+  // model() cria automaticamente um output `valorChange`
+  valor = model('');
 }
+```
 
-// tarefa-form.component.ts
-import { Component, Output, EventEmitter } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-
-@Component({
-  selector: 'app-tarefa-form',
-  standalone: true,
-  imports: [FormsModule],
-  template: `
-    <div class="tarefa-form">
-      <input
-        type="text"
-        [(ngModel)]="novaTarefa"
-        placeholder="Digite uma nova tarefa"
-        (keyup.enter)="adicionarTarefa()"
-      />
-      <button (click)="adicionarTarefa()">Adicionar</button>
-    </div>
-  `,
-  styles: [`
-    .tarefa-form {
-      display: flex;
-      margin-bottom: 20px;
-    }
-    
-    input {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-right: 8px;
-    }
-    
-    button {
-      padding: 8px 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  `]
-})
-export class TarefaFormComponent {
-  novaTarefa = '';
-  tarefaAdicionada = output<string>();
-  
-  adicionarTarefa() {
-    if (this.novaTarefa.trim()) {
-      this.tarefaAdicionada().emit(this.novaTarefa);
-      this.novaTarefa = '';
-    }
-  }
-}
-
-// lista-tarefas.component.ts
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { TarefaItemComponent } from './tarefa-item.component';
-import { TarefaFormComponent } from './tarefa-form.component';
-import { Tarefa } from './tarefa.interface';
-
-@Component({
-  selector: 'app-lista-tarefas',
-  standalone: true,
-  imports: [CommonModule, TarefaItemComponent, TarefaFormComponent],
-  template: `
-    <div class="container">
-      <h1>Lista de Tarefas</h1>
-      
-      <app-tarefa-form
-        (tarefaAdicionada)="adicionarTarefa($event)"
-      ></app-tarefa-form>
-      
-      <div class="estatisticas">
-        <p>Total: {{ tarefas.length }}</p>
-        <p>Concluídas: {{ tarefasConcluidas }}</p>
-        <p>Pendentes: {{ tarefas.length - tarefasConcluidas }}</p>
-      </div>
-      
-      <div class="lista-tarefas">
-        @for (tarefa of tarefas; track tarefa.id) {
-          <app-tarefa-item
-            [tarefa]="tarefa"
-            (tarefaConcluida)="marcarConcluida($event)"
-            (tarefaRemovida)="removerTarefa($event)"
-          ></app-tarefa-item>
-        } @empty {
-          <p class="mensagem-vazia">Nenhuma tarefa adicionada.</p>
-        }
-      </div>
-      
-      @if (tarefas.length > 0) {
-        <div class="acoes">
-          <button class="btn-limpar" (click)="limparTarefas()">
-            Limpar Todas
-          </button>
-        </div>
-      }
-    </div>
-  `,
-  styles: [`
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    
-    .estatisticas {
-      display: flex;
-      justify-content: space-between;
-      margin: 20px 0;
-      padding: 10px;
-      background-color: #f0f0f0;
-      border-radius: 4px;
-    }
-    
-    .mensagem-vazia {
-      text-align: center;
-      color: #888;
-      padding: 20px;
-    }
-    
-    .acoes {
-      margin-top: 20px;
-      text-align: center;
-    }
-    
-    .btn-limpar {
-      padding: 8px 16px;
-      background-color: #ff9800;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  `]
-})
-export class ListaTarefasComponent {
-  tarefas: Tarefa[] = [];
-  proximoId = 1;
-  
-  get tarefasConcluidas(): number {
-    return this.tarefas.filter(t => t.concluida).length;
-  }
-  
-  adicionarTarefa(titulo: string) {
-    const novaTarefa: Tarefa = {
-      id: this.proximoId++,
-      titulo,
-      concluida: false
-    };
-    
-    this.tarefas = [...this.tarefas, novaTarefa];
-  }
-  
-  marcarConcluida(id: number) {
-    this.tarefas = this.tarefas.map(tarefa => {
-      if (tarefa.id === id) {
-        return { ...tarefa, concluida: !tarefa.concluida };
-      }
-      return tarefa;
-    });
-  }
-  
-  removerTarefa(id: number) {
-    this.tarefas = this.tarefas.filter(tarefa => tarefa.id !== id);
-  }
-  
-  limparTarefas() {
-    this.tarefas = [];
-  }
-}
-
+```typescript
 // app.component.ts
-import { Component } from '@angular/core';
-import { ListaTarefasComponent } from './lista-tarefas.component';
+import { Component, signal, computed } from '@angular/core';
+import { CampoComponent } from './app-campo.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ListaTarefasComponent],
+  imports: [CampoComponent],
   template: `
-    <div class="app-container">
-      <app-lista-tarefas></app-lista-tarefas>
+    <div class="p-6 max-w-sm space-y-4">
+      <h2 class="text-xl font-bold text-gray-800">Cadastro</h2>
+
+      <!-- [(valor)] usa o two-way binding gerado automaticamente pelo model() -->
+      <app-campo rotulo="Nome" [(valor)]="nome" />
+      <app-campo rotulo="Sobrenome" [(valor)]="sobrenome" />
+
+      <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+        <p class="text-sm text-blue-800">
+          Nome completo: <strong>{{ nomeCompleto() }}</strong>
+        </p>
+      </div>
     </div>
   `,
-  styles: [`
-    .app-container {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-  `]
 })
-export class AppComponent {}
+export class AppComponent {
+  nome      = signal('');
+  sobrenome = signal('');
+
+  nomeCompleto = computed(() => `${this.nome()} ${this.sobrenome()}`.trim());
+}
 ```
 
-## 8. Boas Práticas para Componentes
+### Como funciona o two-way binding
 
-1. **Princípio da Responsabilidade Única**: Cada componente deve ter uma única responsabilidade.
+Quando você declara `valor = model('')`, o Angular gera automaticamente um output chamado `valorChange`. A sintaxe `[(valor)]` é equivalente a:
 
-2. **Componentes Pequenos e Reutilizáveis**: Crie componentes específicos para melhor reutilização.
+```html
+<!-- [(valor)]="nome" é açúcar sintático para: -->
+<app-campo [valor]="nome" (valorChange)="nome.set($event)" />
+```
 
-3. **Imutabilidade nos Dados**: Evite mutações diretas de dados, prefira criar novos objetos.
+### Model obrigatório e alias
 
-4. **Encapsulamento**: Mantenha a lógica interna do componente protegida e exponha apenas o necessário via APIs (Inputs/Outputs).
+```typescript
+export class CampoComponent {
+  // model obrigatório
+  valor = model.required<string>();
 
-5. **Nomenclatura Consistente**:
-   - Nomes de componentes: `feature.component.ts`
-   - Classes: `FeatureComponent`
-   - Seletores: `app-feature`
+  // model com alias
+  texto = model('', { alias: 'conteudo' });
+  // no template pai: [(conteudo)]="meuSignal"
+}
+```
 
-6. **Separação de Preocupações**: Mantenha o template (HTML) focado na apresentação e a classe (TS) na lógica.
+### Quando usar `model()` vs `input()` + `output()`
 
-7. **Use OnPush para Melhor Desempenho**:
-   ```typescript
-   @Component({
-     // ... outras configurações
-     changeDetection: ChangeDetectionStrategy.OnPush
-   })
-   ```
+- Use **`model()`** quando o componente representa um controle de formulário (input, select, checkbox) ou qualquer UI que o usuário modifica diretamente.
+- Use **`input()` + `output()`** quando a comunicação pai→filho e filho→pai envolve eventos semânticamente distintos (ex.: `[tarefa]` + `(tarefaRemovida)`).
 
-8. **Descarregamento de Recursos**: Implemente OnDestroy para limpar recursos quando o componente for destruído.
+---
 
-## Conclusão
+## 6. Outputs — Emitindo Eventos para o Pai
 
-Os componentes são fundamentais no Angular e compreender como utilizá-los efetivamente é essencial para criar aplicações robustas e escaláveis. Nesta aula, cobrimos os conceitos principais:
+Use a função `output()` para declarar eventos customizados que o componente filho envia ao pai.
 
-1. Estrutura básica de componentes
-2. Seletores para identificação de componentes
-3. Estilização isolada
-4. Inputs para comunicação de cima para baixo
-5. Outputs para comunicação de baixo para cima
-6. Projeção de conteúdo para composição flexível
+### Exemplo básico
 
-Combinando esses conceitos, você pode criar interfaces ricas e interativas com código organizado e reutilizável.
+```typescript
+// app-avaliacao.component.ts
+import { Component, output, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-avaliacao',
+  standalone: true,
+  template: `
+    <div class="flex gap-1">
+      @for (estrela of estrelas; track estrela) {
+        <button
+          (click)="selecionar(estrela)"
+          class="text-2xl transition-transform hover:scale-125"
+          [class]="estrela <= nota() ? 'text-yellow-400' : 'text-gray-300'">
+          ★
+        </button>
+      }
+    </div>
+    <p class="text-sm text-gray-500 mt-1">Nota selecionada: {{ nota() }}</p>
+  `,
+})
+export class AvaliacaoComponent {
+  nota    = signal(0);
+  estrelas = [1, 2, 3, 4, 5];
+
+  // Emite a nota escolhida para o componente pai
+  notaSelecionada = output<number>();
+
+  selecionar(valor: number) {
+    this.nota.set(valor);
+    this.notaSelecionada.emit(valor);
+  }
+}
+```
+
+```typescript
+// app.component.ts
+import { Component, signal } from '@angular/core';
+import { AvaliacaoComponent } from './app-avaliacao.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [AvaliacaoComponent],
+  template: `
+    <div class="p-6 max-w-sm space-y-4">
+      <h2 class="text-xl font-bold">Avalie o produto</h2>
+      <app-avaliacao (notaSelecionada)="registrarNota($event)" />
+
+      @if (mensagem()) {
+        <p class="text-green-700 font-medium">{{ mensagem() }}</p>
+      }
+    </div>
+  `,
+})
+export class AppComponent {
+  mensagem = signal('');
+
+  registrarNota(nota: number) {
+    this.mensagem.set(`Você deu ${nota} estrela(s). Obrigado!`);
+  }
+}
+```
+
+### Output com alias
+
+```typescript
+export class AvaliacaoComponent {
+  notaSelecionada = output<number>({ alias: 'ratingChanged' });
+}
+```
+
+```html
+<app-avaliacao (ratingChanged)="registrarNota($event)" />
+```
+
+---
+
+## 7. Lifecycle Hooks — Ciclo de Vida
+
+O Angular chama métodos específicos ao longo da vida do componente. Implemente as interfaces correspondentes para garantir segurança de tipos.
+
+### Tabela de hooks
+
+| Hook | Quando é chamado |
+|---|---|
+| `constructor` | Ao instanciar a classe (antes dos inputs) |
+| `ngOnInit` | Uma vez, após os inputs serem inicializados |
+| `ngOnChanges` | Sempre que um input muda (inclusive na inicialização) |
+| `ngOnDestroy` | Uma vez, antes de destruir o componente |
+| `ngAfterViewInit` | Uma vez, após a view do componente ser inicializada |
+| `ngDoCheck` | A cada ciclo de detecção de mudanças (use com cautela) |
+
+### Ordem de execução na inicialização
+
+```
+constructor → ngOnChanges → ngOnInit → ngDoCheck → ngAfterViewInit
+```
+
+### Exemplo — `ngOnInit` e `ngOnDestroy`
+
+```typescript
+import { Component, input, OnInit, OnDestroy } from '@angular/core';
+
+@Component({
+  selector: 'app-timer',
+  standalone: true,
+  template: `
+    <div class="p-4 bg-gray-100 rounded-lg text-center">
+      <p class="text-sm text-gray-500">Componente: <strong>{{ nome() }}</strong></p>
+      <p class="text-4xl font-mono font-bold text-blue-700">{{ segundos() }}</p>
+      <p class="text-xs text-gray-400 mt-1">segundos ativos</p>
+    </div>
+  `,
+})
+export class TimerComponent implements OnInit, OnDestroy {
+  nome     = input('Timer');
+  segundos = signal(0);
+
+  private intervalo: ReturnType<typeof setInterval> | null = null;
+
+  ngOnInit() {
+    // Inicia o contador após os inputs estarem disponíveis
+    this.intervalo = setInterval(() => this.segundos.update(s => s + 1), 1000);
+    console.log(`Timer "${this.nome()}" iniciado.`);
+  }
+
+  ngOnDestroy() {
+    // Limpa recursos para evitar vazamentos de memória
+    if (this.intervalo) clearInterval(this.intervalo);
+    console.log(`Timer "${this.nome()}" destruído.`);
+  }
+}
+```
+
+```typescript
+// app.component.ts
+import { Component, signal } from '@angular/core';
+import { TimerComponent } from './app-timer.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [TimerComponent],
+  template: `
+    <div class="p-6 space-y-4">
+      <button
+        (click)="mostrar.set(!mostrar())"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded">
+        {{ mostrar() ? 'Remover' : 'Mostrar' }} Timer
+      </button>
+
+      @if (mostrar()) {
+        <app-timer nome="Contador Principal" />
+      }
+    </div>
+  `,
+})
+export class AppComponent {
+  mostrar = signal(true);
+}
+```
+
+> Alterne o botão e observe no console: `ngOnInit` e `ngOnDestroy` são chamados corretamente.
+
+### Exemplo — `ngOnChanges`
+
+```typescript
+import { Component, input, signal, OnChanges, SimpleChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-log-mudancas',
+  standalone: true,
+  template: `
+    <div class="p-3 bg-yellow-50 border border-yellow-200 rounded">
+      <p class="font-medium text-yellow-800">Histórico de mudanças:</p>
+      <ul class="mt-2 space-y-1">
+        @for (log of historico(); track log) {
+          <li class="text-sm text-yellow-700">{{ log }}</li>
+        }
+      </ul>
+    </div>
+  `,
+})
+export class LogMudancasComponent implements OnChanges {
+  valor    = input<string>('');
+  historico = signal<string[]>([]);
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['valor']) {
+      const { previousValue, currentValue, firstChange } = changes['valor'];
+      const entrada = firstChange
+        ? `Valor inicial: "${currentValue}"`
+        : `"${previousValue}" → "${currentValue}"`;
+      this.historico.update(h => [...h, entrada]);
+    }
+  }
+}
+```
+
+```typescript
+// app.component.ts
+import { Component, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { LogMudancasComponent } from './app-log-mudancas.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [FormsModule, LogMudancasComponent],
+  template: `
+    <div class="p-6 max-w-sm space-y-4">
+      <input
+        [ngModel]="texto()"
+        (ngModelChange)="texto.set($event)"
+        placeholder="Digite algo..."
+        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <app-log-mudancas [valor]="texto()" />
+    </div>
+  `,
+})
+export class AppComponent {
+  texto = signal('');
+}
+```
+
+---
+
+## 8. Exemplo Completo — Lista de Recados
+
+Aplicação dos conceitos: inputs, outputs, lifecycle hooks e Tailwind.
+
+```typescript
+// app-recado-item.component.ts
+import { Component, input, output } from '@angular/core';
+
+@Component({
+  selector: 'app-recado-item',
+  standalone: true,
+  template: `
+    <li class="flex items-center justify-between px-4 py-3 bg-white border rounded-lg shadow-sm">
+      <span class="text-gray-800"
+        [class.line-through]="lido()"
+        [class.text-gray-400]="lido()">
+        {{ texto() }}
+      </span>
+      <div class="flex gap-2">
+        <button
+          (click)="marcarLido.emit(id())"
+          class="text-xs bg-green-100 hover:bg-green-200 text-green-700 font-medium py-1 px-2 rounded">
+          {{ lido() ? 'Desmarcar' : 'Lido' }}
+        </button>
+        <button
+          (click)="remover.emit(id())"
+          class="text-xs bg-red-100 hover:bg-red-200 text-red-700 font-medium py-1 px-2 rounded">
+          Remover
+        </button>
+      </div>
+    </li>
+  `,
+})
+export class RecadoItemComponent {
+  id    = input.required<number>();
+  texto = input.required<string>();
+  lido  = input(false);
+
+  marcarLido = output<number>();
+  remover    = output<number>();
+}
+```
+
+```typescript
+// app-lista-recados.component.ts
+import { Component, signal, computed, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RecadoItemComponent } from './app-recado-item.component';
+
+interface Recado {
+  id: number;
+  texto: string;
+  lido: boolean;
+}
+
+@Component({
+  selector: 'app-lista-recados',
+  standalone: true,
+  imports: [FormsModule, RecadoItemComponent],
+  template: `
+    <div class="max-w-lg mx-auto p-6 space-y-4">
+      <h1 class="text-2xl font-bold text-gray-800">📝 Recados</h1>
+
+      <!-- Formulário -->
+      <div class="flex gap-2">
+        <input
+          [ngModel]="novoTexto()"
+          (ngModelChange)="novoTexto.set($event)"
+          (keyup.enter)="adicionar()"
+          placeholder="Novo recado..."
+          class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <button
+          (click)="adicionar()"
+          [disabled]="!novoTexto().trim()"
+          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-medium py-2 px-4 rounded-lg text-sm">
+          Adicionar
+        </button>
+      </div>
+
+      <!-- Estatísticas -->
+      <div class="flex gap-4 text-sm text-gray-500">
+        <span>Total: <strong>{{ recados().length }}</strong></span>
+        <span>Lidos: <strong class="text-green-600">{{ totalLidos() }}</strong></span>
+        <span>Pendentes: <strong class="text-yellow-600">{{ recados().length - totalLidos() }}</strong></span>
+      </div>
+
+      <!-- Lista -->
+      <ul class="space-y-2">
+        @for (recado of recados(); track recado.id) {
+          <app-recado-item
+            [id]="recado.id"
+            [texto]="recado.texto"
+            [lido]="recado.lido"
+            (marcarLido)="alternarLido($event)"
+            (remover)="removerRecado($event)" />
+        } @empty {
+          <p class="text-center text-gray-400 py-8">Nenhum recado ainda.</p>
+        }
+      </ul>
+
+      <!-- Limpar lidos -->
+      @if (totalLidos() > 0) {
+        <button
+          (click)="limparLidos()"
+          class="w-full text-sm text-gray-500 hover:text-red-600 underline">
+          Remover todos os lidos
+        </button>
+      }
+    </div>
+  `,
+})
+export class ListaRecadosComponent implements OnInit {
+  recados   = signal<Recado[]>([]);
+  novoTexto = signal('');
+  proximoId = 1;
+
+  totalLidos = computed(() => this.recados().filter(r => r.lido).length);
+
+  ngOnInit() {
+    const salvos = localStorage.getItem('recados');
+    if (salvos) this.recados.set(JSON.parse(salvos));
+  }
+
+  adicionar() {
+    if (!this.novoTexto().trim()) return;
+    this.recados.update(lista => [
+      ...lista,
+      { id: this.proximoId++, texto: this.novoTexto().trim(), lido: false },
+    ]);
+    this.novoTexto.set('');
+    this.salvar();
+  }
+
+  alternarLido(id: number) {
+    this.recados.update(lista =>
+      lista.map(r => r.id === id ? { ...r, lido: !r.lido } : r)
+    );
+    this.salvar();
+  }
+
+  removerRecado(id: number) {
+    this.recados.update(lista => lista.filter(r => r.id !== id));
+    this.salvar();
+  }
+
+  limparLidos() {
+    this.recados.update(lista => lista.filter(r => !r.lido));
+    this.salvar();
+  }
+
+  private salvar() {
+    localStorage.setItem('recados', JSON.stringify(this.recados()));
+  }
+}
+```
+
+---
+
+## 9. Resumo
+
+| Conceito | API Angular | Quando usar |
+|---|---|---|
+| Estado reativo | `signal()` | Qualquer propriedade que a UI deve observar |
+| Dados de entrada (pai → filho) | `input()` / `input.required()` | Passar configuração ou dados para o filho |
+| Two-way binding (pai ↔ filho) | `model()` / `model.required()` | Controles de formulário e UI editável |
+| Eventos de saída (filho → pai) | `output()` | Notificar o pai sobre ações do usuário |
+| Transformar input | `input(val, { transform })` | Converter tipos (string → number, boolean) |
+| Alias de input/output/model | `input(val, { alias })` | Nomear diferente no template e no TypeScript |
+| Inicialização | `ngOnInit` | Código que depende dos inputs iniciais |
+| Reagir a mudanças de input | `ngOnChanges` | Lógica baseada em mudanças de inputs |
+| Limpeza de recursos | `ngOnDestroy` | Cancelar timers, subscriptions, etc. |
+
+---
+
+## Referências
+
+- [Anatomy of a component](https://angular.dev/guide/components)
+- [Component selectors](https://angular.dev/guide/components/selectors)
+- [Styling components](https://angular.dev/guide/components/styling)
+- [Inputs](https://angular.dev/guide/components/inputs)
+- [Model inputs](https://angular.dev/guide/components/inputs#model-inputs)
+- [Outputs](https://angular.dev/guide/components/outputs)
+- [Lifecycle](https://angular.dev/guide/components/lifecycle)

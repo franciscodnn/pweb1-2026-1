@@ -53,11 +53,21 @@ import { Component, signal, computed } from '@angular/core';
   selector: 'app-carrinho',
   standalone: true,
   template: `
-    <h2>Carrinho</h2>
-    <p>Itens: {{ quantidade() }}</p>
-    <p>Total: R$ {{ total() }}</p>
-    <button (click)="adicionar()">+ Adicionar item (R$ 29,90)</button>
-    <button (click)="remover()" [disabled]="quantidade() === 0">- Remover</button>
+    <div class="p-4 max-w-sm border rounded shadow">
+      <h2 class="text-xl font-bold mb-2">Carrinho</h2>
+      <p class="text-gray-700">Itens: <span class="font-semibold">{{ quantidade() }}</span></p>
+      <p class="text-gray-700 mb-4">Total: <span class="font-semibold text-green-700">R$ {{ total() }}</span></p>
+      <div class="flex gap-2">
+        <button (click)="adicionar()"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-3 rounded">
+          + Adicionar item (R$ 29,90)
+        </button>
+        <button (click)="remover()" [disabled]="quantidade() === 0"
+          class="bg-red-500 hover:bg-red-600 disabled:opacity-40 text-white font-medium py-1 px-3 rounded">
+          - Remover
+        </button>
+      </div>
+    </div>
   `,
 })
 export class CarrinhoComponent {
@@ -111,10 +121,18 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [FormsModule],
   template: `
-    <div>
-      <label>Nome: <input [(ngModel)]="nome" /></label>
-      <label>Sobrenome: <input [(ngModel)]="sobrenome" /></label>
-      <p>Nome completo: <strong>{{ nomeCompleto() }}</strong></p>
+    <div class="p-4 max-w-sm space-y-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-gray-700">Nome</label>
+        <input [(ngModel)]="nome"
+          class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-gray-700">Sobrenome</label>
+        <input [(ngModel)]="sobrenome"
+          class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      </div>
+      <p class="text-gray-800">Nome completo: <strong class="text-blue-700">{{ nomeCompleto() }}</strong></p>
     </div>
   `,
 })
@@ -155,13 +173,16 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [FormsModule],
   template: `
-    <input [ngModel]="busca()" (ngModelChange)="busca.set($event)" placeholder="Buscar produto...">
-    <p>{{ resultados().length }} resultado(s)</p>
-    <ul>
-      @for (item of resultados(); track item) {
-        <li>{{ item }}</li>
-      }
-    </ul>
+    <div class="p-4 max-w-sm space-y-3">
+      <input [ngModel]="busca()" (ngModelChange)="busca.set($event)" placeholder="Buscar produto..."
+        class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <p class="text-sm text-gray-500">{{ resultados().length }} resultado(s)</p>
+      <ul class="divide-y divide-gray-200 border rounded">
+        @for (item of resultados(); track item) {
+          <li class="px-3 py-2 text-sm text-gray-800">{{ item }}</li>
+        }
+      </ul>
+    </div>
   `,
 })
 export class BuscaComponent {
@@ -192,15 +213,25 @@ import { Component, signal } from '@angular/core';
   selector: 'app-abas-problema',
   standalone: true,
   template: `
-    <div>
-      @for (aba of abas(); track aba) {
-        <button (click)="selectedTab.set(aba)">{{ aba }}</button>
-      }
+    <div class="p-4 max-w-sm space-y-3">
+      <div class="flex gap-2">
+        @for (aba of abas(); track aba) {
+          <button (click)="selectedTab.set(aba)"
+            class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium py-1 px-3 rounded">
+            {{ aba }}
+          </button>
+        }
+      </div>
+      <p class="text-gray-700">Aba ativa: <span class="font-semibold">{{ selectedTab() }}</span></p>
+      <button (click)="trocarAbas()"
+        class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium py-1 px-3 rounded">
+        Trocar conjunto de abas
+      </button>
+      <p class="text-red-600 text-sm font-medium">
+        ⚠ Após trocar as abas, selectedTab ainda mostra "{{ selectedTab() }}"
+        que pode não existir mais!
+      </p>
     </div>
-    <p>Aba ativa: {{ selectedTab() }}</p>
-    <button (click)="trocarAbas()">Trocar conjunto de abas</button>
-    <p style="color: red">⚠ Após trocar as abas, selectedTab ainda mostra "{{ selectedTab() }}"
-      que pode não existir mais!</p>
   `,
 })
 export class AbasProblemaComponent {
@@ -225,13 +256,21 @@ import { Component, signal, linkedSignal } from '@angular/core';
   selector: 'app-abas',
   standalone: true,
   template: `
-    <div>
-      @for (aba of abas(); track aba) {
-        <button (click)="selectedTab.set(aba)">{{ aba }}</button>
-      }
+    <div class="p-4 max-w-sm space-y-3">
+      <div class="flex gap-2">
+        @for (aba of abas(); track aba) {
+          <button (click)="selectedTab.set(aba)"
+            class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm font-medium py-1 px-3 rounded">
+            {{ aba }}
+          </button>
+        }
+      </div>
+      <p class="text-gray-700">Aba ativa: <span class="font-semibold text-blue-700">{{ selectedTab() }}</span></p>
+      <button (click)="trocarAbas()"
+        class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded">
+        Trocar conjunto de abas
+      </button>
     </div>
-    <p>Aba ativa: {{ selectedTab() }}</p>
-    <button (click)="trocarAbas()">Trocar conjunto de abas</button>
   `,
 })
 export class AbasComponent {
@@ -263,19 +302,30 @@ interface Categoria {
   selector: 'app-categorias',
   standalone: true,
   template: `
-    <h2>Categorias</h2>
-    <div>
-      @for (cat of categorias(); track cat.id) {
-        <button (click)="categoriaSelecionada.set(cat)">
-          {{ cat.nome }}
-        </button>
-      }
-    </div>
-    <p>Selecionada: <strong>{{ categoriaSelecionada().nome }}</strong></p>
+    <div class="p-4 max-w-sm space-y-3">
+      <h2 class="text-xl font-bold">Categorias</h2>
+      <div class="flex flex-wrap gap-2">
+        @for (cat of categorias(); track cat.id) {
+          <button (click)="categoriaSelecionada.set(cat)"
+            class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 text-sm font-medium py-1 px-3 rounded">
+            {{ cat.nome }}
+          </button>
+        }
+      </div>
+      <p class="text-gray-700">Selecionada: <strong class="text-indigo-700">{{ categoriaSelecionada().nome }}</strong></p>
 
-    <hr>
-    <button (click)="adicionarCategoria()">Adicionar Jogos</button>
-    <button (click)="removerEletronicos()">Remover Eletrônicos</button>
+      <hr class="border-gray-300" />
+      <div class="flex gap-2">
+        <button (click)="adicionarCategoria()"
+          class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded">
+          Adicionar Jogos
+        </button>
+        <button (click)="removerEletronicos()"
+          class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded">
+          Remover Eletrônicos
+        </button>
+      </div>
+    </div>
   `,
 })
 export class CategoriasComponent {
@@ -335,9 +385,13 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [FormsModule],
   template: `
-    <h2>Bloco de Notas</h2>
-    <textarea [ngModel]="nota()" (ngModelChange)="nota.set($event)" rows="5" cols="40"></textarea>
-    <p><small>Salvo automaticamente</small></p>
+    <div class="p-4 max-w-md space-y-2">
+      <h2 class="text-xl font-bold">Bloco de Notas</h2>
+      <textarea [ngModel]="nota()" (ngModelChange)="nota.set($event)" rows="5"
+        class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none">
+      </textarea>
+      <p class="text-xs text-gray-400">💾 Salvo automaticamente</p>
+    </div>
   `,
 })
 export class NotasComponent {
