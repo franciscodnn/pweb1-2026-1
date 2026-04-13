@@ -14,6 +14,23 @@ import { Footer } from './footer/footer';
   // styleUrl: './app.css'
 })
 export class App {
+  // const [teste, setTeste] = useState('teste');
   protected readonly title = signal('app-teste-angular');
   public disciplina: string = 'Programação para a Web I';
+
+  protected theme = signal('white');
+
+  protected labelTheme = signal('noite');
+
+  protected toggle() {
+    if(this.theme() === 'white') {
+      this.labelTheme.set('dia');
+      this.theme.set('dark');
+
+      return;
+    }
+
+    this.labelTheme.set('noite');
+    this.theme.set('white');
+  }
 }
