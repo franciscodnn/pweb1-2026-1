@@ -1,0 +1,13 @@
+<p>Estoque: {{ estoque() }}</p>
+<p>Quantidade de itens: {{ quantidade() }}</p>
+<p>Dobro da quantidade de itens: {{ dobroQuantidade() }}</p>
+
+<button type="button" (click)="adicionarItem('Impressora')"
+  class="bg-blue-400 hover:bg-blue-800 p-4 m-2">
+    Adicionar item
+</button>
+
+<button type="button" (click)="removerItem()"
+  class="bg-red-400 hover:bg-red-800 p-4 m-2">
+    Remover item
+</button>

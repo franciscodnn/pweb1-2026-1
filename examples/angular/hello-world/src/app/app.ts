@@ -1,11 +1,19 @@
 import { Component, signal } from '@angular/core';
+import { TesteSignal } from './teste-signal/teste-signal';
+import { BuscaComponent } from './busca/busca';
+import { AbasProblemaComponent } from './abas-problema/abas-problema';
+import { NotasComponent } from './notas/notas';
 
 @Component({
   selector: 'app-root',  
-  templateUrl: './app.html',
-  // template: `
-  //   <main><h1 class='text-center text-4xl'>Olá, Mundo!</h1></main>
-  // `,
+  // templateUrl: './app.html',
+  imports: [NotasComponent, TesteSignal, BuscaComponent, AbasProblemaComponent],
+  template: `
+    <!-- <teste-signal /> -->    
+    <!-- <app-busca /> -->
+    <!-- <app-abas-problema></app-abas-problema> -->
+    <app-notas />
+  `,
   // styleUrl: './app.css'
 })
 export class App {
