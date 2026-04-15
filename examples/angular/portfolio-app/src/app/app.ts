@@ -1,48 +1,22 @@
-import { Component, signal } from '@angular/core';
-
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  techs: string[];
-  repoUrl: string;
-}
+import { Component, signal, inject } from '@angular/core';
+import { ProjectCard } from './components/project-card/project-card';
+import { Project } from './models/project.model';
+import { ProjectService } from './services/project-service';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [ProjectCard],
   templateUrl: './app.html',
   styleUrl: './app.css',
   host: { '[class.dark]': 'darkMode()' },
 })
 export class App {
+  private projectService = inject(ProjectService);
   protected readonly darkMode = signal(true);
 
   protected toggleTheme(): void {
     this.darkMode.update(dark => !dark);
   }
 
-  protected readonly projects = signal<Project[]>([
-    {
-      id: 1,
-      title: 'Portfolio App',
-      description: 'Este portfolio, desenvolvido com Angular e Tailwind CSS.',
-      techs: ['Angular', 'TypeScript', 'Tailwind CSS'],
-      repoUrl: 'https://github.com',
-    },
-    {
-      id: 2,
-      title: 'Task Manager API',
-      description: 'API RESTful para gerenciamento de tarefas com autenticacao JWT.',
-      techs: ['NestJS', 'TypeScript', 'PostgreSQL'],
-      repoUrl: 'https://github.com',
-    },
-    {
-      id: 3,
-      title: 'E-commerce Dashboard',
-      description: 'Painel administrativo com graficos em tempo real e gestao de pedidos.',
-      techs: ['Angular', 'TypeScript', 'Node.js'],
-      repoUrl: 'https://github.com',
-    },
-  ]);
+  protected readonly projects = this.projectService.projects;
 }

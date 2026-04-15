@@ -17,7 +17,7 @@
 
   <!-- Secao: Perfil -->
   <section class="bg-slate-200 dark:bg-slate-800 px-6 py-16 text-center">
-    <img src="https://ui-avatars.com/api/?name=Francisco&background=random&size=128&rounded=true&bold=true"
+    <img src="https://ui-avatars.com/api/?name=Francisco Dantas&background=random&size=128&rounded=true&bold=true"
       alt="Foto de Francisco Dantas" class="w-28 h-28 rounded-full mx-auto mb-4 ring-4 ring-indigo-500" />
     <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-1">Francisco Dantas</h1>
     <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-4">Desenvolvedor Full Stack</p>
@@ -34,27 +34,12 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
         @for (project of projects(); track project.id) {
-        <article class="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col gap-3">
-            <h3 class="text-white font-semibold text-lg">{{ project.title }}</h3>
-            <p class="text-slate-400 text-sm flex-1">{{ project.description }}</p>
-
-            <div class="flex flex-wrap gap-2">
-              @for (tech of project.techs; track tech) {
-                <span class="text-xs px-2 py-1 bg-indigo-900/60 text-indigo-300 rounded-full">
-                  {{ tech }}
-                </span>
-              }
-            </div>
-
-            <a
-              [href]="project.repoUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
-              Ver repositorio &rarr;
-            </a>
-          </article>
+          <project-card
+            [title]="project.title"
+            [description]="project.description"
+            [repoUrl]="project.repoUrl"
+            [techs]="project.techs"
+          ></project-card>
         }
 
       </div>
