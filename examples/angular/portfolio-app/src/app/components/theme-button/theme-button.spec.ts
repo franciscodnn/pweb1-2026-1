@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Footer } from './footer';
+import { ThemeButton } from './theme-button';
 
-describe('Footer', () => {
-  let component: Footer;
-  let fixture: ComponentFixture<Footer>;
+describe('ThemeButton', () => {
+  let component: ThemeButton;
+  let fixture: ComponentFixture<ThemeButton>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Footer],
+      imports: [ThemeButton],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Footer);
+    fixture = TestBed.createComponent(ThemeButton);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
