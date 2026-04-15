@@ -9,7 +9,7 @@
     [attr.aria-label]="darkMode() ? 'Ativar tema claro' : 'Ativar tema escuro'"
     [attr.title]="darkMode() ? 'Ativar tema claro' : 'Ativar tema escuro'"
   >
-    {{ darkMode() ? '☀️' : '🌙' }}
+    <span class="grayscale">{{ darkMode() ? '☀️' : '🌙' }}</span>
   </button>
 </header>
 
