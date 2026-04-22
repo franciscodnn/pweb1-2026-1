@@ -5,7 +5,7 @@
     <div class="flex flex-wrap gap-2">
         @for (tech of techs(); track tech) {
         <span class="text-xs px-2 py-1 bg-indigo-900/60 text-indigo-300 rounded-full">
-            {{ tech }}
+            {{ tech | titlecase }}
         </span>
         }
     </div>

@@ -1,8 +1,9 @@
 import { Component, input } from '@angular/core';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'project-card',
-  imports: [],
+  imports: [TitleCasePipe],
   templateUrl: './project-card.html',
   styleUrl: './project-card.css',
 })

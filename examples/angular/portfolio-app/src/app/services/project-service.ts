@@ -7,11 +7,12 @@ import { Project } from '../models/project.model';
 })
 export class ProjectService {
   private _projects = signal<Project[]>([
+    
     {
       id: 1,
       title: 'Portfolio App',
       description: 'Este portfolio, desenvolvido com Angular e Tailwind CSS.',
-      techs: ['Angular', 'TypeScript', 'Tailwind CSS'],
+      techs: ['ANGULAR', 'TYPESCRIPT', 'TAILWIND CSS'],
       repoUrl: 'https://github.com',
     },
     {
@@ -28,6 +29,7 @@ export class ProjectService {
       techs: ['Angular', 'TypeScript', 'Node.js'],
       repoUrl: 'https://github.com',
     },
+    
   ]);
 
   get projects() {
