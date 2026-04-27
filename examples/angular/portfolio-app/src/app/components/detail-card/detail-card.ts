@@ -1,17 +1,17 @@
 import { Component, inject, signal, input, effect } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 // import { ProjectsService } from '../../services/projects.service';
 // import { Project } from '../../models/project';
 import { ProjectService } from '../../services/project-service';
 import { Project } from '../../models/project.model';
 
 @Component({
-  selector: 'app-detail-project',
+  selector: 'app-detail-card',
   imports: [],
-  templateUrl: './detail-project.html',
-  styleUrl: './detail-project.css',
+  templateUrl: './detail-card.html',
+  styleUrl: './detail-card.css',
 })
-export class DetailProject {
+export class DetailCard {
   id = input<string>('');
   project = signal<Project | null>(null);
 
@@ -36,10 +36,10 @@ export class DetailProject {
     // });
 
     effect(() => {
-      const id = Number(this.id());
-      console.log('ID from input signal:', id);
-      const found = this.projectService.projects().find(p => p.id === id) ?? null;
-      this.project.set(found);
+       const id = Number(this.id());
+       console.log('ID from input signal:', id);
+       const found = this.projectService.projects().find(p => p.id === id) ?? null;
+       this.project.set(found);
     });
   }
 
