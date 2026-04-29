@@ -5,6 +5,8 @@
 
     <span>
       <a routerLink="/about"
+      routerLinkActive="text-indigo-600 dark:text-indigo-400 font-semibold underline"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="absolute right-22 top-5 text-slate-800 dark:text-white">About</a>
     </span>
     <app-btn-theme

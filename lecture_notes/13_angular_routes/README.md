@@ -161,6 +161,33 @@ Cada rota pode carregar dados extras via `data`, úteis para configurar o compor
 }
 ```
 
+Para ler esses dados no componente, use `ActivatedRoute.data` (ou `snapshot.data` para leitura única):
+
+**admin.component.ts**
+```typescript
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-admin',
+  template: `<h1>Área: {{ breadcrumb }}</h1>`
+})
+export class AdminComponent {
+  private route = inject(ActivatedRoute);
+
+  breadcrumb = this.route.snapshot.data['breadcrumb']; // 'Administração'
+  role       = this.route.snapshot.data['role'];       // 'admin'
+
+  // --- Versão reativa (Observable), útil se os dados podem mudar ---
+  // constructor() {
+  //   this.route.data.subscribe(data => {
+  //     this.breadcrumb = data['breadcrumb'];
+  //     this.role       = data['role'];
+  //   });
+  // }
+}
+```
+<!--
 ### Providers por Rota
 
 Rotas podem fornecer serviços ou tokens disponíveis **apenas para aquela seção**:
@@ -176,6 +203,39 @@ Rotas podem fornecer serviços ou tokens disponíveis **apenas para aquela seç�
 }
 ```
 
+Para consumir esses providers nos componentes filhos, use `inject()` normalmente — o Angular resolve automaticamente o escopo da rota:
+
+**admin-users.component.ts**
+```typescript
+import { Component, inject } from '@angular/core';
+import { AdminService } from '../../services/admin.service';
+import { ADMIN_API_KEY } from '../../tokens/admin.token';
+
+@Component({
+  selector: 'app-admin-users',
+  template: `<p>API Key: {{ apiKey }}</p>`
+})
+export class AdminUsersComponent {
+  // Injeta o serviço disponibilizado apenas nesta seção da rota
+  private adminService = inject(AdminService);
+
+  // Injeta o token de valor definido via { provide: ADMIN_API_KEY, useValue: '12345' }
+  apiKey = adminService.ADMIN_API_KEY;
+  // apiKey = inject(ADMIN_API_KEY); // '12345'
+}
+```
+
+O token `ADMIN_API_KEY` é criado com `InjectionToken`:
+
+**tokens/admin.token.ts**
+```typescript
+import { InjectionToken } from '@angular/core';
+
+export const ADMIN_API_KEY = new InjectionToken<string>('ADMIN_API_KEY');
+```
+
+> **Importante:** `AdminService` e `ADMIN_API_KEY` só estão disponíveis para componentes dentro da rota `/admin` e seus filhos. Se tentar injetá-los fora desse escopo, o Angular lançará um erro de dependência não encontrada.
+-->
 ---
 
 ## 4. Estratégias de Carregamento

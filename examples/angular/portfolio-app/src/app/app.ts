@@ -2,11 +2,11 @@ import { Component, signal, inject } from '@angular/core';
 import { Project } from './models/project.model';
 import { BtnTheme } from './components/btn-theme/btn-theme';
 
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [BtnTheme, RouterOutlet, RouterLink],
+  imports: [BtnTheme, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css',
   host: { '[class.dark]': 'darkMode()' },
