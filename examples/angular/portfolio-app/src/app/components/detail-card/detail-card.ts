@@ -1,5 +1,8 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, signal, input, effect } from '@angular/core';
 import { Router } from '@angular/router';
+// import { ProjectsService } from '../../services/projects.service';
+// import { Project } from '../../models/project';
+import { ProjectService } from '../../services/project-service';
 import { Project } from '../../models/project.model';
 
 @Component({
@@ -9,11 +12,6 @@ import { Project } from '../../models/project.model';
   styleUrl: './detail-card.css',
 })
 export class DetailCard {
-  // Preenchido automaticamente pelo resolver via input binding
-  project = input<Project | null>(null);
-
-  private router = inject(Router);
-  /*
   id = input<string>('');
   project = signal<Project | null>(null);
 
@@ -44,7 +42,6 @@ export class DetailCard {
        this.project.set(found);
     });
   }
-    */
 
   goBack() {
     this.router.navigate(['/']);
