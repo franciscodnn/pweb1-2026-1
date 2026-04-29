@@ -270,6 +270,56 @@ export class AppComponent {}
 
 > **Nota:** No Angular v20, `standalone: true` não precisa mais ser declarado — todos os componentes são standalone por padrão.
 
+### Named Router Outlets (Outlets Nomeados)
+
+É possível ter **múltiplos outlets** na mesma página, cada um renderizando um componente independente. Basta dar um `name` ao outlet:
+
+**app.component.ts**
+```html
+<main>
+  <router-outlet />                    <!-- outlet primário -->
+</main>
+
+<aside>
+  <router-outlet name="sidebar" />     <!-- outlet secundário -->
+</aside>
+```
+
+Para ativar um outlet nomeado, use a propriedade `outlet` na rota:
+
+**app.routes.ts**
+```typescript
+export const routes: Routes = [
+  { path: '',        component: HomeComponent },
+  { path: 'help',    component: HelpComponent,    outlet: 'sidebar' },
+  { path: 'filters', component: FiltersComponent, outlet: 'sidebar' },
+];
+```
+
+A URL gerada combina os dois outlets com a notação de parênteses:
+
+```
+/home(sidebar:help)
+```
+
+Para navegar programaticamente para um outlet nomeado:
+
+```typescript
+this.router.navigate([{ outlets: { primary: 'home', sidebar: 'help' } }]);
+
+// Ou para fechar o outlet nomeado:
+this.router.navigate([{ outlets: { sidebar: null } }]);
+```
+
+E no template com `routerLink`:
+
+```html
+<a [routerLink]="[{ outlets: { sidebar: 'help' } }]">Abrir Ajuda</a>
+<a [routerLink]="[{ outlets: { sidebar: null } }]">Fechar</a>
+```
+
+> **Quando usar:** Outlets nomeados são úteis para painéis laterais, modais baseados em rota, ou qualquer área da UI que precise de navegação independente do conteúdo principal — como um chat, notificações ou filtros avançados.
+
 ---
 
 ## 6. Navegação com RouterLink
