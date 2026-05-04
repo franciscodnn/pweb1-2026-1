@@ -1,5 +1,5 @@
 import { Component, inject, signal, input, effect } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 // import { ProjectsService } from '../../services/projects.service';
 // import { Project } from '../../models/project';
 import { ProjectService } from '../../services/project-service';
@@ -15,7 +15,7 @@ export class DetailCard {
   id = input<string>('');
   project = signal<Project | null>(null);
 
-  // private route          = inject(ActivatedRoute);
+  private route          = inject(ActivatedRoute);
   private router         = inject(Router);
   private projectService = inject(ProjectService);
 

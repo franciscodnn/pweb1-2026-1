@@ -2,8 +2,28 @@
   <div class="max-w-2xl mx-auto">
 
     <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-8">Cadastrar projeto</h1>
+    <p class="text-slate-900 dark:text-white mb-8">
+      Título: {{ form.get('title')?.value || 'Sem texto no momento'}}<br>
+      Título (touched?): {{ form.get('title')?.touched }}<br>
+      Título (dirty?): {{ form.get('title')?.dirty }}<br>
+      Título (invalid?): {{ form.get('title')?.invalid }}<br>
+      Título (error?): {{ form.get('title')?.errors }}<br>
+    </p>
 
-    <form class="flex flex-col gap-6">
+    <p class="text-slate-900 dark:text-white mb-8">
+      Descrição: {{ form.get('description')?.value || 'Sem texto no momento'}}
+    </p>
+
+    <p class="text-slate-900 dark:text-white mb-8">
+      TEchs: {{ form.get('techs')?.value || 'Sem texto no momento'}}
+    </p>
+
+    <p class="text-slate-900 dark:text-white mb-8">
+      URL: {{ form.get('url')?.value || 'Sem texto no momento'}}
+    </p>
+
+    <form class="flex flex-col gap-6" 
+      [formGroup]="form" (ngSubmit)="save()">
 
       <!-- Título -->
       <div class="flex flex-col gap-1">
@@ -14,8 +34,14 @@
           id="title"
           type="text"
           placeholder="Ex: Portfolio App"
+          formControlName="title"
           class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
+        
+        @if(form.get('title')?.touched && form.get('title')?.invalid) {
+          <div class="text-red-500">Erro existente!</div>
+        }
+        <div></div>
       </div>
 
       <!-- Descrição -->
@@ -27,6 +53,7 @@
           id="description"
           rows="4"
           placeholder="Descreva o projeto..."
+          formControlName="description"
           class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
         ></textarea>
       </div>
@@ -40,6 +67,7 @@
           id="techs"
           type="text"
           placeholder="Ex: Angular, TypeScript, Node.js"
+          formControlName="techs"
           class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <span class="text-xs text-slate-400">Separe por vírgula</span>
@@ -54,6 +82,7 @@
           id="repoUrl"
           type="url"
           placeholder="https://github.com/usuario/projeto"
+          formControlName="url"
           class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
