@@ -9,13 +9,17 @@ import { RouterOutlet, RouterLink } from '@angular/router';
   imports: [BtnTheme, RouterOutlet, RouterLink],
   templateUrl: './app.html',
   styleUrl: './app.css',
-  host: { '[class.dark]': 'darkMode()' },
+  host: { '[class.dark]': 'themeService.darkMode()' },
 })
 export class App {  
-  protected readonly darkMode = signal(true);
+  protected themeService = {
+    darkMode: signal(true)
+  };
+
+  // protected readonly darkMode = signal(true);
 
   protected switchTheme(event: boolean) {
-    this.darkMode.set(event);
+    this.themeService.darkMode.set(event);
   }
 
 }

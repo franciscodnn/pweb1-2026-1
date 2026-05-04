@@ -1,0 +1,79 @@
+<section class="min-h-screen bg-slate-50 dark:bg-slate-950 px-6 py-16">
+  <div class="max-w-2xl mx-auto">
+
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-8">Cadastrar projeto</h1>
+
+    <form class="flex flex-col gap-6">
+
+      <!-- Título -->
+      <div class="flex flex-col gap-1">
+        <label for="title" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+          Título <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="title"
+          type="text"
+          placeholder="Ex: Portfolio App"
+          class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+
+      <!-- Descrição -->
+      <div class="flex flex-col gap-1">
+        <label for="description" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+          Descrição <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="description"
+          rows="4"
+          placeholder="Descreva o projeto..."
+          class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Tecnologias -->
+      <div class="flex flex-col gap-1">
+        <label for="techs" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+          Tecnologias
+        </label>
+        <input
+          id="techs"
+          type="text"
+          placeholder="Ex: Angular, TypeScript, Node.js"
+          class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <span class="text-xs text-slate-400">Separe por vírgula</span>
+      </div>
+
+      <!-- URL do repositório -->
+      <div class="flex flex-col gap-1">
+        <label for="repoUrl" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+          URL do repositório
+        </label>
+        <input
+          id="repoUrl"
+          type="url"
+          placeholder="https://github.com/usuario/projeto"
+          class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+
+      <!-- Ações -->
+      <div class="flex gap-3 pt-2">
+        <button
+          type="submit"
+          class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        >
+          Salvar
+        </button>
+        <a
+          href="/"
+          class="px-6 py-2.5 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-400 text-sm font-medium rounded-lg transition-colors"
+        >
+          Cancelar
+        </a>
+      </div>
+
+    </form>
+  </div>
+</section>
