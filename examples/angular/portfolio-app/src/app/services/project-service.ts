@@ -35,4 +35,26 @@ export class ProjectService {
   get projects() {
     return this._projects.asReadonly();
   }
+
+  public create(newProject: Project) {
+    newProject.id = this._projects().length + 1;
+    
+    this._projects.set( [...this._projects(), newProject] );
+
+    // this._projects.update( projects => [...projects, newProject] );
+  }
+
+  public removeById(id: number) {
+    const filteredProjects = this._projects().filter(
+      elem => {
+        console.log(`${elem.id} === ${id}`);
+        if (elem.id === id) return false;
+        return true;
+      }
+    );
+
+    this._projects.set(filteredProjects);
+
+    console.log(filteredProjects);
+  }
 }

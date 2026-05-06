@@ -46,4 +46,10 @@ export class DetailCard {
   goBack() {
     this.router.navigate(['/']);
   }
+
+  remove() {
+    this.projectService.removeById(Number(this.id()));
+
+    this.goBack();
+  }
 }

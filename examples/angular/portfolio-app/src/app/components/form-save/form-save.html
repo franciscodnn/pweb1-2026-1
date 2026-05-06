@@ -2,7 +2,7 @@
   <div class="max-w-2xl mx-auto">
 
     <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-8">Cadastrar projeto</h1>
-    <p class="text-slate-900 dark:text-white mb-8">
+    <!-- <p class="text-slate-900 dark:text-white mb-8">
       Título: {{ form.get('title')?.value || 'Sem texto no momento'}}<br>
       Título (touched?): {{ form.get('title')?.touched }}<br>
       Título (dirty?): {{ form.get('title')?.dirty }}<br>
@@ -20,7 +20,7 @@
 
     <p class="text-slate-900 dark:text-white mb-8">
       URL: {{ form.get('url')?.value || 'Sem texto no momento'}}
-    </p>
+    </p> -->
 
     <form class="flex flex-col gap-6" 
       [formGroup]="form" (ngSubmit)="save()">
@@ -38,8 +38,18 @@
           class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         
-        @if(form.get('title')?.touched && form.get('title')?.invalid) {
-          <div class="text-red-500">Erro existente!</div>
+        @if(title?.touched 
+             && title?.invalid) {
+              @if(title?.errors?.['required']) {
+                <div class="text-red-500">Campo obrigatório!</div>
+              }
+              @if(title?.errors?.['minlength']) {
+                <div class="text-red-500">Mínimo de 5 caracteres!</div>
+              }
+              @if(title?.errors?.['invalidTitle']) {
+                <div class="text-red-500">Título deve possuir duas palavras!</div>
+              }
+          
         }
         <div></div>
       </div>

@@ -10,8 +10,8 @@ const titleResolver: ResolveFn<string> =
 
 export const routes: Routes = [
     { path: '', component: Projects, title: 'Home'},
-    // { path: 'detail/:id', component: DetailCard, title: titleResolver},
-    { path: 'detail', component: DetailCard, title: titleResolver},
+    { path: 'detail/:id', component: DetailCard, title: titleResolver},
+    // { path: 'detail', component: DetailCard, title: titleResolver},
     { path: 'about', component: About, title: 'Sobre o dev'},
     { path: 'projects/new', component: FormSave, title: 'Novo Projeto' },
     { path: '**', component: NotFound, title: 'Página não encontrada'}
