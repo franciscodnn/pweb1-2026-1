@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { Validators, ValidatorFn, AbstractControl, ValidationErrors, 
-  FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  Validators, ValidatorFn, AbstractControl, ValidationErrors,
+  FormControl, FormGroup, ReactiveFormsModule
+} from '@angular/forms';
 import { Project } from '../../models/project.model';
 import { ProjectService } from '../../services/project-service';
 
@@ -9,11 +11,11 @@ export function titleValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const title = String(control.value).trim();
     if (!title) return null;
-    
+
     // Lógica de validação de duas palavras para o título
     const regex = /^[a-zA-Z0-9]+\s[a-zA-Z0-9]+$/;
     const valid = regex.test(title);
-    
+
     return valid ? null : { invalidTitle: true };
   };
 }
@@ -28,10 +30,10 @@ export class FormSave {
   private projectService = inject(ProjectService);
 
   protected form = new FormGroup({
-    title : new FormControl('', 
-      [Validators.required, 
-        Validators.minLength(5), titleValidator()]),
-    description : new FormControl(''),
+    title: new FormControl('',
+      [Validators.required,
+      Validators.minLength(5), titleValidator()]),
+    description: new FormControl(''),
     techs: new FormControl(''),
     url: new FormControl('')
   });
@@ -47,7 +49,7 @@ export class FormSave {
 
     this.projectService.create(newProject);
 
-    console.log(this.form.value);
+    // console.log(this.form.value);
   }
 
   get title() { return this.form.get('title'); }
