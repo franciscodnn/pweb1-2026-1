@@ -38,8 +38,8 @@ export class DetailCard {
     effect(() => {
        const id = Number(this.id());
        console.log('ID from input signal:', id);
-       const found = this.projectService.projects().find(p => p.id === id) ?? null;
-       this.project.set(found);
+       const found = this.projectService.projects()?.find(p => p.id === id) ?? null;
+       this.project.set(found ?? null);
     });
   }
 

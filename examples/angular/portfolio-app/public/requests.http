@@ -1,0 +1,53 @@
+@url = https://ebtckzlaqfdvxpgvajsj.supabase.co/rest/v1
+@apiKey = sb_publishable_y9cj3uKhm6gl853rnu3zFA_UmZC5M54
+
+### GET
+GET {{url}}/project
+apikey: {{apiKey}}
+Authorization: Bearer {{apiKey}}
+
+### POST
+POST {{url}}/project
+apikey: {{apiKey}}
+Authorization: Bearer {{apiKey}}
+Content-Type: application/json
+Prefer: return=representation
+
+{    
+    "title": "Task Manager API",
+    "description": "API RESTful para gerenciamento de tarefas com autenticacao JWT.",
+    "techs": ["NestJS", "TypeScript", "PostgreSQL"],
+    "repoUrl": "https://github.com"
+}
+
+
+### DELETE
+DELETE {{url}}/project?id=eq.10
+apikey: {{apiKey}}
+Authorization: Bearer {{apiKey}}
+
+### PATCH
+PATCH {{url}}/project?id=eq.1
+apikey: {{apiKey}}
+Authorization: Bearer {{apiKey}}
+Content-type: application/json
+Prefer: return=representation
+
+{
+    "title": "Portfolio APP"
+}
+
+### PUT
+PUT {{url}}/project?id=eq.10
+apikey: {{apiKey}}
+Authorization: Bearer {{apiKey}}
+Content-type: application/json
+Prefer: return=representation
+
+{
+    "id": 10,
+    "title": "Portfolio APP",
+    "description": "Painel administrativo",
+    "techs": ["Angular", "TypeScript"],
+    "repoUrl": "https://github.com"
+}
