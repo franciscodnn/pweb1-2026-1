@@ -1,0 +1,5 @@
+### GET
+GET http://localhost:8088/portfolio/read
+
+### GET
+GET http://localhost:8088/portfolio/readPortfolio
