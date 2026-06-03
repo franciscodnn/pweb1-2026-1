@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+// @NoArgsConstructor
 public class Portfolio {
     private Long id;
     private String title;
@@ -14,6 +14,6 @@ public class Portfolio {
     private String repo;
     private String[] techs;
 
-    // public Portfolio () { }
+    public Portfolio () { }
     
 }
