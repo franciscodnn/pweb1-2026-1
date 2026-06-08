@@ -5,12 +5,17 @@ Content-Type: application/json
 ### GET
 GET http://localhost:8088/portfolio/readPortfolio
 
+### GET
+GET http://localhost:8088/portfolio/all
+
+### GET
+GET http://localhost:8088/portfolio/get/2
+
 ### POST
 POST http://localhost:8088/portfolio/create
 Content-Type: application/json
 
 {
-    "id": 10,
     "title": "Portfolio App",
     "description": "Portfolio App",
     "repo": "github.com/",
@@ -19,7 +24,7 @@ Content-Type: application/json
 
 
 ### DELETE
-DELETE http://localhost:8088/portfolio/delete/10
+DELETE http://localhost:8088/portfolio/delete/4
 
 
 ### PUT

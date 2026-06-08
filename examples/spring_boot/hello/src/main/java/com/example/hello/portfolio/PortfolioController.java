@@ -2,7 +2,12 @@ package com.example.hello.portfolio;
 
 import com.example.hello.HelloApplication;
 
+import com.example.hello.portfolio.PortfolioService;
+
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +26,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("/portfolio")
 public class PortfolioController {
+    private final PortfolioService service;
+
+    public PortfolioController(PortfolioService service) {
+        this.service = service;
+    }
 
     @GetMapping(
         path = "/read", 
@@ -50,18 +60,32 @@ public class PortfolioController {
         );
     }
 
+    @GetMapping("/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Portfolio> all() {
+        return this.service.all();
+    }
+
+    @GetMapping("/get/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Portfolio one(@PathVariable Long id) {
+        return this.service.get(id);
+    }
+
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.OK)
     public Portfolio create(@RequestBody Portfolio entity) {
-        System.out.println("Post recebido!");        
-        
-        return entity;
+        return this.service.create(entity);
     }
 
     @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        System.out.println("Removendo o recurso com id: " + id);
+        // System.out.println("Removendo o recurso com id: " + id);
+        boolean removed = this.service.remove(id);
+
+        if(removed) System.out.println("Objeto removido");
+        else System.out.println("Objeto NÃO removido");
     }
     
     @PutMapping("/update/{id}")
