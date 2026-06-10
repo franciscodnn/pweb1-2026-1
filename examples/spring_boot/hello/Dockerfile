@@ -3,8 +3,8 @@ FROM maven:3.9-eclipse-temurin-25-alpine AS builder
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-COPY mvnw .
-RUN ./mvnw clean package -DskipTests
+# COPY mvnw .
+RUN mvn clean package -DskipTests
 
 # Estágio 2: Pega o arquivo .jar pronto e roda em um servidor limpo com Java 25
 FROM eclipse-temurin:25-jre-alpine
