@@ -12,7 +12,7 @@ WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 
 # Expõe a porta que o Render precisa
-EXPOSE 8080
+EXPOSE 8080:8080
 
 # Comando que mantém a API ligada
 ENTRYPOINT ["java", "-jar", "app.jar"]
