@@ -7,32 +7,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PortfolioService {
-    private final ArrayList<Portfolio> database;
-
+    // private final ArrayList<Portfolio> database;
     private final ProjectRepository repository;
 
     public PortfolioService(ProjectRepository repository) {
         this.repository = repository;
-
-        this.database = new ArrayList<Portfolio>();
-
-        this.seed();
     }
 
     public Portfolio create(Portfolio portfolio) {
-        // portfolio.setId(Long.valueOf(this.database.size() + 2));
-        //this.database.add(portfolio);
-
-        portfolio = this.repository.save(portfolio);
-
-        return portfolio;
+        return this.repository.save(portfolio);
     }
 
-    public boolean remove(Long id) {
-        return this.database.removeIf(element -> element.getId() == id);
+    public void remove(Long id) {        
+        this.repository.deleteById(id);
     }
 
-    public List<Portfolio> all() {
+    public List<Portfolio> all() {        
         return this.repository.findAll();
     }
 
@@ -55,13 +45,15 @@ public class PortfolioService {
         */
 
         /* Programação Imperativa */
+        /* 
         for(Portfolio portfolio : database) {
             if(portfolio.getId() == id) return portfolio;
         }
-
+        */
         return null;
     }
 
+    /*
     private void seed() {
         this.database.add(
         new Portfolio(1L, 
@@ -79,4 +71,5 @@ public class PortfolioService {
             new String[]{"next/react", "tailwind css", "spring boot"}
         ));
     }
+    */
 }

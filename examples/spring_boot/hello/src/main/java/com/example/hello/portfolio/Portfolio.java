@@ -17,13 +17,13 @@ import lombok.NoArgsConstructor;
 @Table(name = "project")
 public class Portfolio {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)    
     private Long id;
     
     private String title;
     private String description;
     private String[] techs;
-
+    
     @Column(name = "repo_url")
     private String repo;
 
