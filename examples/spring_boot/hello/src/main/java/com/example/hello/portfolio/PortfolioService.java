@@ -1,6 +1,7 @@
 package com.example.hello.portfolio;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -8,16 +9,21 @@ import org.springframework.stereotype.Service;
 public class PortfolioService {
     private final ArrayList<Portfolio> database;
 
-    public PortfolioService() {
+    private final ProjectRepository repository;
+
+    public PortfolioService(ProjectRepository repository) {
+        this.repository = repository;
+
         this.database = new ArrayList<Portfolio>();
 
         this.seed();
     }
 
     public Portfolio create(Portfolio portfolio) {
-        portfolio.setId(Long.valueOf(this.database.size() + 2));
+        // portfolio.setId(Long.valueOf(this.database.size() + 2));
+        //this.database.add(portfolio);
 
-        this.database.add(portfolio);
+        portfolio = this.repository.save(portfolio);
 
         return portfolio;
     }
@@ -26,8 +32,8 @@ public class PortfolioService {
         return this.database.removeIf(element -> element.getId() == id);
     }
 
-    public ArrayList<Portfolio> all() {
-        return this.database;
+    public List<Portfolio> all() {
+        return this.repository.findAll();
     }
 
     public Portfolio get(Long id) {

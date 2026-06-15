@@ -9,7 +9,7 @@ Content-Type: application/json
 GET http://localhost:8088/portfolio/readPortfolio
 
 ### GET
-GET {{host}}/portfolio/all
+GET {{localhost}}/portfolio/all
 
 ### GET
 GET http://localhost:8088/portfolio/all
@@ -18,7 +18,7 @@ GET http://localhost:8088/portfolio/all
 GET http://localhost:8088/portfolio/get/2
 
 ### POST
-POST {{host}}/portfolio/create
+POST {{localhost}}/portfolio/create
 Content-Type: application/json
 
 {

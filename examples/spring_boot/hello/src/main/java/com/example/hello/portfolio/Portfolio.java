@@ -1,5 +1,6 @@
 package com.example.hello.portfolio;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,8 +22,10 @@ public class Portfolio {
     
     private String title;
     private String description;
-    private String repo;
     private String[] techs;
+
+    @Column(name = "repo_url")
+    private String repo;
 
     public Portfolio() { }
 
