@@ -1,3 +1,6 @@
+@host=https://pweb1-2026-1.onrender.com
+@localhost=http://localhost:8088
+
 ### GET
 GET http://localhost:8088/portfolio/read?tipo=portfolio
 Content-Type: application/json
@@ -6,13 +9,16 @@ Content-Type: application/json
 GET http://localhost:8088/portfolio/readPortfolio
 
 ### GET
+GET {{host}}/portfolio/all
+
+### GET
 GET http://localhost:8088/portfolio/all
 
 ### GET
 GET http://localhost:8088/portfolio/get/2
 
 ### POST
-POST http://localhost:8088/portfolio/create
+POST {{host}}/portfolio/create
 Content-Type: application/json
 
 {

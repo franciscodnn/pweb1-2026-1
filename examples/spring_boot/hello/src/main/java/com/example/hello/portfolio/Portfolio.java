@@ -24,6 +24,16 @@ public class Portfolio {
     private String repo;
     private String[] techs;
 
+    public Portfolio() { }
+
+    public Portfolio(Long id, String title, String description, String repo, String[] techs) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.repo = repo;
+        this.techs = techs;
+    }
+
     public Long getId() {
         return id;
     }
@@ -55,13 +65,4 @@ public class Portfolio {
         this.techs = techs;
     }
 
-    public Portfolio () { }
-
-    public Portfolio(Long id, String title, String description, String repo, String[] techs) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.repo = repo;
-        this.techs = techs;
-    }
 }
