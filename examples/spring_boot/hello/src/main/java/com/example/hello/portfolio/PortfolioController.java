@@ -82,10 +82,10 @@ public class PortfolioController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         // System.out.println("Removendo o recurso com id: " + id);
-        boolean removed = this.service.remove(id);
+        // boolean removed = this.service.remove(id);
 
-        if(removed) System.out.println("Objeto removido");
-        else System.out.println("Objeto NÃO removido");
+        // if(removed) System.out.println("Objeto removido");
+        // else System.out.println("Objeto NÃO removido");
     }
     
     @PutMapping("/update/{id}")
