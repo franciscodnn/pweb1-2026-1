@@ -25,6 +25,10 @@ public class ProjectService {
         return this.repository.findAll();
     }
 
+    public List<Project> findByContaining(String param) {
+        return this.repository.findByTitleContaining(param);
+    }
+
     public Project get(Long id) {
         /* Usando lambda */
         /* 

@@ -26,6 +26,16 @@ public class ProjectController {
         this.service = service;
     }
 
+    // /portfolio/search?title=teste
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Project> findByParam(
+        @RequestParam(name = "title", required = false) String title) {
+            return this.service.findByContaining(title);
+        
+    }
+    
+
     @GetMapping(
         path = "/read", 
         consumes = "application/json",
