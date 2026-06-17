@@ -1,9 +1,9 @@
-package com.example.hello.portfolio;
+package com.example.hello.project;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProjectRepository extends JpaRepository<Portfolio, Long>{
+public interface ProjectRepository extends JpaRepository<Project, Long>{
 
 }

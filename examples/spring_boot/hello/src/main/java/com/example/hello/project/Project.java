@@ -1,4 +1,4 @@
-package com.example.hello.portfolio;
+package com.example.hello.project;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 // @NoArgsConstructor
 @Entity
 @Table(name = "project")
-public class Portfolio {
+public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)    
     private Long id;
@@ -27,9 +27,9 @@ public class Portfolio {
     @Column(name = "repo_url")
     private String repo;
 
-    public Portfolio() { }
+    public Project() { }
 
-    public Portfolio(Long id, String title, String description, String repo, String[] techs) {
+    public Project(Long id, String title, String description, String repo, String[] techs) {
         this.id = id;
         this.title = title;
         this.description = description;

@@ -1,8 +1,7 @@
-package com.example.hello.portfolio;
+package com.example.hello.project;
 
 import com.example.hello.HelloApplication;
-
-import com.example.hello.portfolio.PortfolioService;
+import com.example.hello.project.ProjectService;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,10 +24,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/portfolio")
-public class PortfolioController {
-    private final PortfolioService service;
+public class ProjectController {
+    private final ProjectService service;
 
-    public PortfolioController(PortfolioService service) {
+    public ProjectController(ProjectService service) {
         this.service = service;
     }
 
@@ -49,9 +48,9 @@ public class PortfolioController {
     }
     
     @GetMapping("/readPortfolio")
-    public ResponseEntity<Portfolio> getPortfolio() {
+    public ResponseEntity<Project> getPortfolio() {
         return ResponseEntity.ok(
-            new Portfolio(1L, 
+            new Project(1L, 
             "Task Manager App", 
             "Task Manager", 
             "github.com",
@@ -62,19 +61,19 @@ public class PortfolioController {
 
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public List<Portfolio> all() {
+    public List<Project> all() {
         return this.service.all();
     }
 
     @GetMapping("/get/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Portfolio one(@PathVariable Long id) {
+    public Project one(@PathVariable Long id) {
         return this.service.get(id);
     }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.OK)
-    public Portfolio create(@RequestBody Portfolio entity) {
+    public Project create(@RequestBody Project entity) {
         return this.service.create(entity);
     }
 
@@ -90,9 +89,9 @@ public class PortfolioController {
     
     @PutMapping("/update/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Portfolio update(
+    public Project update(
         @PathVariable Long id, 
-        @RequestBody Portfolio entity) {
+        @RequestBody Project entity) {
         System.out.println("Recurso: " + id + ", title: " + entity.getTitle());
 
         entity.setId(id);
@@ -102,9 +101,9 @@ public class PortfolioController {
 
     @PatchMapping("/patch/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Portfolio patch(
+    public Project patch(
         @PathVariable Long id,
-        @RequestBody Portfolio entity) {
+        @RequestBody Project entity) {
 
         System.out.println(entity);
 

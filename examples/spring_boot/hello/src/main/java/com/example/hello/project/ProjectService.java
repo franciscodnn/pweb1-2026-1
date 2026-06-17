@@ -1,4 +1,4 @@
-package com.example.hello.portfolio;
+package com.example.hello.project;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,15 +6,15 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PortfolioService {
+public class ProjectService {
     // private final ArrayList<Portfolio> database;
     private final ProjectRepository repository;
 
-    public PortfolioService(ProjectRepository repository) {
+    public ProjectService(ProjectRepository repository) {
         this.repository = repository;
     }
 
-    public Portfolio create(Portfolio portfolio) {
+    public Project create(Project portfolio) {
         return this.repository.save(portfolio);
     }
 
@@ -22,11 +22,11 @@ public class PortfolioService {
         this.repository.deleteById(id);
     }
 
-    public List<Portfolio> all() {        
+    public List<Project> all() {        
         return this.repository.findAll();
     }
 
-    public Portfolio get(Long id) {
+    public Project get(Long id) {
         /* Usando lambda */
         /* 
         final Portfolio portfolio[] = {new Portfolio()};
