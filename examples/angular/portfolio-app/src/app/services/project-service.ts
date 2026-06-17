@@ -9,13 +9,15 @@ import { Observable } from 'rxjs';
 })
 export class ProjectService {
   private api = inject(HttpClient);
-  private apiUrl = 'https://ebtckzlaqfdvxpgvajsj.supabase.co/rest/v1';
-  private token = 'sb_publishable_y9cj3uKhm6gl853rnu3zFA_UmZC5M54';
+  private apiUrl = 'https://pweb1-2026-1.onrender.com';
+  // private apiUrl = 'https://ebtckzlaqfdvxpgvajsj.supabase.co/rest/v1';
+  // private token = 'sb_publishable_y9cj3uKhm6gl853rnu3zFA_UmZC5M54';
 
   constructor() {
     this.load();
   }
 
+  /*
   private get headers() {
     return {
       'apikey': this.token,
@@ -24,11 +26,11 @@ export class ProjectService {
       'Prefer': 'return=representation'
     };
   }
-
+  */
 
   public load(): void {
-    this.api.get<Project[] | null>(`${this.apiUrl}/project`, {
-      headers: this.headers
+    this.api.get<Project[] | null>(`${this.apiUrl}/portfolio/all`, {
+      // headers: this.headers
     }).subscribe({
       next: (projects) => {
         console.log(projects);
@@ -73,8 +75,8 @@ export class ProjectService {
     
     // this._projects.set( [...this._projects() ?? [], newProject] );
 
-    this.api.post(`${this.apiUrl}/project`, newProject, {
-      headers: this.headers
+    this.api.post(`${this.apiUrl}/portfolio/create`, newProject, {
+      // headers: this.headers
     }).subscribe({
       next: (project) => {
         console.log(project);
@@ -97,7 +99,7 @@ export class ProjectService {
     this._projects.set(filteredProjects ?? null);
 
     this.api.delete(`${this.apiUrl}/project?id=eq.${id}`, {
-      headers: this.headers
+      // headers: this.headers
     }).subscribe({
       next: (project) => console.log(project)
     });
