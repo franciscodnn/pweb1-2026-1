@@ -1,8 +1,5 @@
 package com.example.hello.project;
 
-import com.example.hello.HelloApplication;
-import com.example.hello.project.ProjectService;
-
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -19,8 +16,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
-
-
 
 @RestController
 @RequestMapping("/portfolio")
